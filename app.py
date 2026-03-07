@@ -153,12 +153,16 @@ class ShellProcess:
                 os.close(slave_fd)
             env = os.environ.copy()
             env["TERM"] = "dumb"
-            env["PS1"] = "$ "
             env["PROMPT_COMMAND"] = ""
             shell_name = os.path.basename(shell)
             if shell_name == "zsh":
-                shell_args = [shell, "-f", "--no-rcs"]
+                env["PS1"] = "$ "
+                env["PROMPT"] = "$ "
+                env["ZDOTDIR"] = "/tmp/yakety-yak-empty"
+                os.makedirs("/tmp/yakety-yak-empty", exist_ok=True)
+                shell_args = [shell, "-f"]
             else:
+                env["PS1"] = "$ "
                 shell_args = [shell, "--norc", "--noprofile"]
             os.execvpe(shell, shell_args, env)
         else:
