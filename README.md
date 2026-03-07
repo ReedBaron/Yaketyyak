@@ -154,18 +154,17 @@ Press `Ctrl+G` or type `/git <url>` to analyze any public GitHub repository. The
 
 | Factor | Points |
 |--------|--------|
-| Stars (1-100+) | up to 15 |
-| Forks | up to 10 |
-| Contributors | up to 10 |
-| Recent updates | up to 15 |
+| Stars (1-1000+) | up to 25 |
+| Recent updates (within 6 months) | up to 15 |
 | License present | 10 |
-| Releases published | up to 10 |
+| Contributors (1-10+) | up to 10 |
+| Forks | up to 10 |
 | Description present | 5 |
-| Low issue ratio | up to 5 |
+| Releases published | up to 5 |
+| Has wiki or pages | up to 5 |
 | Not archived | 5 |
-| Not a fork | 5 |
-| Has homepage | 5 |
-| Has wiki/pages | up to 5 |
+| Not a fork | up to 3 |
+| Penalties | -5 to -15 for high issue ratios, stale repos, archived projects |
 
 ---
 
@@ -231,7 +230,7 @@ The built-in knowledge base covers:
 - **52 error patterns** — "command not found", "permission denied", segfaults, Python tracebacks, Node.js errors
 - **6 output patterns** — recognizes common output formats (file listings, git status, etc.)
 
-The knowledge base is stored at `~/.yakety-yak/terminal_knowledge_base.json` and is user-editable.
+The knowledge base is stored at `~/.yakety-yak/knowledge_base.json` (auto-generated on first run) and is user-editable.
 
 ---
 
@@ -286,7 +285,7 @@ python build.py --full   # Full + AI edition
 Automated builds via GitHub Actions (`.github/workflows/build-release.yml`):
 
 - Triggered on version tags (`v*`)
-- Builds macOS (Intel + Apple Silicon) and Linux x86_64
+- Builds macOS and Linux x86_64
 - Creates GitHub Release with:
   - `YaketyYak-Lite-macOS.zip`
   - `YaketyYak-Full-macOS.zip`
@@ -298,8 +297,8 @@ Automated builds via GitHub Actions (`.github/workflows/build-release.yml`):
 
 ## Privacy
 
-- **Lite Edition**: Zero network calls. Everything runs locally.
-- **Full Edition with Ollama**: AI runs on your machine. No data leaves your computer.
+- **Command translation** is fully local by default. The built-in knowledge base and Ollama both run offline with zero network calls.
+- **Git Translator** connects to the GitHub API to fetch repository data (public, read-only).
 - **Cloud AI (optional)**: Only used if you explicitly set `OPENAI_API_KEY`. Commands are sent to OpenAI's API.
 - **No telemetry**. No analytics. No accounts. No tracking.
 
