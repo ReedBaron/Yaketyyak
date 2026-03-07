@@ -48,28 +48,62 @@ def build_executable():
 
     local_modules = ["translator.py", "knowledge_base.py", "themes.py"]
 
-    cmd = [
-        sys.executable, "-m", "PyInstaller",
-        "--onefile", "--name", EXECUTABLE_NAME,
-        "--console", "--clean", "--noconfirm",
-        "--paths", ".",
-        "app.py",
-    ]
-
-    for mod in local_modules:
-        if os.path.exists(mod):
-            cmd.extend(["--add-data", f"{mod}{os.pathsep}."])
-
-    for imp in HIDDEN_IMPORTS:
-        cmd.extend(["--hidden-import", imp])
-
+    textual_css_data = ""
     try:
         import textual as _t
         css_dir = os.path.join(os.path.dirname(_t.__file__), "css")
         if os.path.isdir(css_dir):
-            cmd.extend(["--add-data", f"{css_dir}{os.pathsep}textual/css"])
+            textual_css_data = f"('{css_dir}', 'textual/css'),"
     except ImportError:
         pass
+
+    hidden_imports_str = ", ".join(f"'{h}'" for h in HIDDEN_IMPORTS)
+
+    spec_content = f"""# -*- mode: python ; coding: utf-8 -*-
+import os
+
+a = Analysis(
+    ['app.py'] + {[m for m in local_modules if os.path.exists(m)]},
+    pathex=['.'],
+    binaries=[],
+    datas=[{textual_css_data}],
+    hiddenimports=[{hidden_imports_str}],
+    hookspath=[],
+    hooksconfig={{}},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    [],
+    name='{EXECUTABLE_NAME}',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+)
+"""
+
+    spec_path = f"{EXECUTABLE_NAME}.spec"
+    with open(spec_path, "w") as f:
+        f.write(spec_content)
+
+    print(f"Generated {spec_path}")
+    print(f"Local modules included: {[m for m in local_modules if os.path.exists(m)]}")
+
+    cmd = [
+        sys.executable, "-m", "PyInstaller",
+        "--clean", "--noconfirm",
+        spec_path,
+    ]
 
     print("Compiling executable...")
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -77,7 +111,8 @@ def build_executable():
     exe_path = os.path.join("dist", EXECUTABLE_NAME)
     if result.returncode != 0 or not os.path.exists(exe_path):
         print("Build failed!")
-        print(result.stderr[-2000:] if result.stderr else "No error output")
+        print(result.stdout[-2000:] if result.stdout else "No stdout")
+        print(result.stderr[-2000:] if result.stderr else "No stderr")
         sys.exit(1)
 
     size_mb = os.path.getsize(exe_path) / (1024 * 1024)
