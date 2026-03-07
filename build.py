@@ -32,7 +32,7 @@ HIDDEN_IMPORTS = [
     "textual.widgets._rich_log",
     "rich", "rich.text", "rich.console", "rich.markup",
     "rich.segment", "rich.style", "rich.color", "rich.terminal_theme",
-    "openai", "pexpect", "translator", "knowledge_base", "themes",
+    "openai", "pexpect", "certifi", "translator", "knowledge_base", "themes",
 ]
 
 
@@ -57,6 +57,14 @@ def build_executable():
     except ImportError:
         pass
 
+    certifi_data = ""
+    try:
+        import certifi as _c
+        certifi_dir = os.path.dirname(_c.__file__)
+        certifi_data = f"('{certifi_dir}', 'certifi'),"
+    except ImportError:
+        pass
+
     hidden_imports_str = ", ".join(f"'{h}'" for h in HIDDEN_IMPORTS)
 
     spec_content = f"""# -*- mode: python ; coding: utf-8 -*-
@@ -66,7 +74,7 @@ a = Analysis(
     ['app.py'] + {[m for m in local_modules if os.path.exists(m)]},
     pathex=['.'],
     binaries=[],
-    datas=[{textual_css_data}],
+    datas=[{textual_css_data}{certifi_data}],
     hiddenimports=[{hidden_imports_str}],
     hookspath=[],
     hooksconfig={{}},

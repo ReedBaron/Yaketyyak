@@ -9,12 +9,23 @@ import fcntl
 import termios
 import threading
 import json
+import ssl
 import urllib.request
 from datetime import datetime, timezone
 from collections import deque
 
 if getattr(sys, 'frozen', False):
     sys.path.insert(0, sys._MEIPASS)
+
+try:
+    import certifi
+    SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    SSL_CONTEXT = ssl.create_default_context()
+    try:
+        SSL_CONTEXT.load_default_locations()
+    except Exception:
+        SSL_CONTEXT = ssl._create_unverified_context()
 
 from textual import work
 from textual.app import App, ComposeResult
@@ -159,11 +170,17 @@ class ShellProcess:
             env["PROMPT_COMMAND"] = ""
             shell_name = os.path.basename(shell)
             if shell_name == "zsh":
+                zdotdir = "/tmp/yakety-yak-zsh"
+                os.makedirs(zdotdir, exist_ok=True)
+                zshrc_path = os.path.join(zdotdir, ".zshrc")
+                with open(zshrc_path, "w") as f:
+                    f.write('PROMPT="$ "\n')
+                    f.write("unsetopt zle\n")
+                    f.write("setopt no_prompt_cr\n")
+                env["ZDOTDIR"] = zdotdir
                 env["PS1"] = "$ "
                 env["PROMPT"] = "$ "
-                env["ZDOTDIR"] = "/tmp/yakety-yak-empty"
-                os.makedirs("/tmp/yakety-yak-empty", exist_ok=True)
-                shell_args = [shell, "-f"]
+                shell_args = [shell, "--no-globalrcs"]
             else:
                 env["PS1"] = "$ "
                 shell_args = [shell, "--norc", "--noprofile"]
@@ -639,7 +656,7 @@ class YaketyYak(App):
                 "Accept": "application/vnd.github.v3+json",
                 "User-Agent": "YaketyYak/1.0",
             })
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as resp:
                 data = json.loads(resp.read())
         except urllib.error.HTTPError as e:
             self.call_from_thread(out.write, "")
@@ -669,7 +686,7 @@ class YaketyYak(App):
                 "Accept": "application/vnd.github.v3+json",
                 "User-Agent": "YaketyYak/1.0",
             })
-            with urllib.request.urlopen(req2, timeout=5) as resp2:
+            with urllib.request.urlopen(req2, timeout=5, context=SSL_CONTEXT) as resp2:
                 link_header = resp2.headers.get("Link", "")
                 if 'rel="last"' in link_header:
                     m = re.search(r'page=(\d+)>; rel="last"', link_header)
@@ -688,7 +705,7 @@ class YaketyYak(App):
                 "Accept": "application/vnd.github.v3+json",
                 "User-Agent": "YaketyYak/1.0",
             })
-            with urllib.request.urlopen(req3, timeout=5) as resp3:
+            with urllib.request.urlopen(req3, timeout=5, context=SSL_CONTEXT) as resp3:
                 link_header = resp3.headers.get("Link", "")
                 if 'rel="last"' in link_header:
                     m = re.search(r'page=(\d+)>; rel="last"', link_header)
