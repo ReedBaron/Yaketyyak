@@ -43,6 +43,28 @@ Screen {
     layout: vertical;
 }
 
+#view-toggle-bar {
+    dock: top;
+    height: 3;
+    layout: horizontal;
+    align: center middle;
+    padding: 0 1;
+}
+
+#view-toggle-bar Button {
+    min-width: 18;
+    height: 3;
+    margin: 0 0;
+}
+
+#btn-terminal-view {
+    border: none;
+}
+
+#btn-git-view {
+    border: none;
+}
+
 #main-container {
     layout: horizontal;
     height: 1fr;
@@ -98,6 +120,59 @@ Screen {
     padding: 0 1;
 }
 
+#git-container {
+    height: 1fr;
+    display: none;
+}
+
+#git-container.active {
+    display: block;
+}
+
+#main-container.hidden {
+    display: none;
+}
+
+#git-panel {
+    width: 100%;
+    height: 100%;
+}
+
+#git-panel-inner {
+    height: 1fr;
+}
+
+#git-title {
+    dock: top;
+    height: 1;
+    text-align: center;
+    text-style: bold;
+    padding: 0 1;
+}
+
+#git-input-row {
+    dock: top;
+    height: 3;
+    layout: horizontal;
+    padding: 0 1;
+}
+
+#git-url-input {
+    width: 1fr;
+}
+
+#btn-analyze {
+    min-width: 14;
+    height: 3;
+    margin: 0 0 0 1;
+}
+
+#git-results {
+    height: 1fr;
+    scrollbar-size: 1 1;
+    padding: 0 1;
+}
+
 #settings-bar {
     dock: bottom;
     height: 3;
@@ -135,6 +210,37 @@ Screen {
 
 /* ── Terminal Theme (default) ── */
 
+Screen.theme-terminal {
+    background: #060a13;
+}
+
+Screen.theme-terminal #view-toggle-bar {
+    background: #0a0e17;
+    border-bottom: solid #10b98130;
+}
+
+Screen.theme-terminal #btn-terminal-view {
+    background: #111827;
+    color: #94a3b8;
+}
+
+Screen.theme-terminal #btn-git-view {
+    background: #111827;
+    color: #94a3b8;
+}
+
+Screen.theme-terminal #btn-terminal-view.active-view {
+    background: #10b981;
+    color: #0a0e17;
+    text-style: bold;
+}
+
+Screen.theme-terminal #btn-git-view.active-view {
+    background: #10b981;
+    color: #0a0e17;
+    text-style: bold;
+}
+
 Screen.theme-terminal #shell-panel {
     border: solid #10b981;
 }
@@ -165,6 +271,32 @@ Screen.theme-terminal #translation-title {
 }
 
 Screen.theme-terminal #translation-output {
+    background: #0a0e17;
+    color: #e2e8f0;
+}
+
+Screen.theme-terminal #git-panel {
+    border: solid #10b981;
+}
+
+Screen.theme-terminal #git-title {
+    background: #10b981;
+    color: #0a0e17;
+}
+
+Screen.theme-terminal #git-url-input {
+    background: #111827;
+    color: #e2e8f0;
+    border: tall #10b981;
+}
+
+Screen.theme-terminal #btn-analyze {
+    background: #10b981;
+    color: #0a0e17;
+    text-style: bold;
+}
+
+Screen.theme-terminal #git-results {
     background: #0a0e17;
     color: #e2e8f0;
 }
@@ -202,6 +334,37 @@ Screen.theme-terminal Footer {
 
 /* ── Glass Theme ── */
 
+Screen.theme-glass {
+    background: #0a0520;
+}
+
+Screen.theme-glass #view-toggle-bar {
+    background: #0f0a2e;
+    border-bottom: solid #6366f130;
+}
+
+Screen.theme-glass #btn-terminal-view {
+    background: #1a1545;
+    color: #a5b4fc;
+}
+
+Screen.theme-glass #btn-git-view {
+    background: #1a1545;
+    color: #a5b4fc;
+}
+
+Screen.theme-glass #btn-terminal-view.active-view {
+    background: #6366f1;
+    color: #e0e7ff;
+    text-style: bold;
+}
+
+Screen.theme-glass #btn-git-view.active-view {
+    background: #6366f1;
+    color: #e0e7ff;
+    text-style: bold;
+}
+
 Screen.theme-glass #shell-panel {
     border: round #6366f1;
 }
@@ -232,6 +395,32 @@ Screen.theme-glass #translation-title {
 }
 
 Screen.theme-glass #translation-output {
+    background: #0f0a2e;
+    color: #c7d2fe;
+}
+
+Screen.theme-glass #git-panel {
+    border: round #818cf8;
+}
+
+Screen.theme-glass #git-title {
+    background: #6366f1;
+    color: #e0e7ff;
+}
+
+Screen.theme-glass #git-url-input {
+    background: #1a1545;
+    color: #e0e7ff;
+    border: round #818cf8;
+}
+
+Screen.theme-glass #btn-analyze {
+    background: #6366f1;
+    color: #e0e7ff;
+    text-style: bold;
+}
+
+Screen.theme-glass #git-results {
     background: #0f0a2e;
     color: #c7d2fe;
 }

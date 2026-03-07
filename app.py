@@ -28,6 +28,7 @@ from textual.widgets import (
     Input,
     Label,
     Select,
+    Button,
 )
 from textual.reactive import reactive
 from textual.message import Message
@@ -84,9 +85,10 @@ automatically. No copy-paste needed!
   3. An explanation appears on the right automatically
 
 [bold]Git Translator:[/]
+  Press [bold cyan]Ctrl+G[/] to switch to the Git Translator view
   Paste any GitHub URL to analyze it instantly
   Example: [bold cyan]https://github.com/torvalds/linux[/]
-  Also works: [bold cyan]/git owner/repo[/]
+  Also works: [bold cyan]/git owner/repo[/] from the terminal view
   Shows: stars, forks, language, license, risk/reward score, and more
 
 [bold]Translate without running:[/]
@@ -99,6 +101,7 @@ automatically. No copy-paste needed!
 
 [bold]Keyboard shortcuts:[/]
   [dim]Ctrl+B[/]  Toggle between Beginner and Familiar mode
+  [dim]Ctrl+G[/]  Toggle Terminal / Git Translator view
   [dim]Ctrl+T[/]  Toggle AI translations on/off
   [dim]Ctrl+S[/]  Switch theme (Terminal / Glass)
   [dim]Ctrl+L[/]  Clear the translation panel
@@ -244,6 +247,7 @@ class YaketyYak(App):
 
     BINDINGS = [
         Binding("ctrl+b", "toggle_mode", "Toggle Mode", key_display="Ctrl+B"),
+        Binding("ctrl+g", "toggle_view", "Git Translator", key_display="Ctrl+G"),
         Binding("ctrl+t", "toggle_ai", "AI Toggle", key_display="Ctrl+T"),
         Binding("ctrl+l", "clear_translations", "Clear Panel", key_display="Ctrl+L"),
         Binding("ctrl+s", "toggle_theme", "Switch Theme", key_display="Ctrl+S"),
@@ -253,6 +257,7 @@ class YaketyYak(App):
     mode = reactive("noob")
     use_ai = reactive(True)
     language = reactive("en")
+    current_view = reactive("terminal")
 
     def __init__(self):
         super().__init__()
@@ -267,6 +272,11 @@ class YaketyYak(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
+
+        with Horizontal(id="view-toggle-bar"):
+            yield Button("\u25b6 Terminal", id="btn-terminal-view", classes="active-view")
+            yield Button("Git Translator", id="btn-git-view")
+
         with Horizontal(id="main-container"):
             with Container(id="shell-panel"):
                 with Vertical(id="shell-panel-inner"):
@@ -281,6 +291,20 @@ class YaketyYak(App):
                     yield Label("TRANSLATION", id="translation-title")
                     yield RichLog(
                         id="translation-output", highlight=False, markup=True, wrap=True
+                    )
+
+        with Container(id="git-container"):
+            with Container(id="git-panel"):
+                with Vertical(id="git-panel-inner"):
+                    yield Label("GIT URL TRANSLATOR", id="git-title")
+                    with Horizontal(id="git-input-row"):
+                        yield Input(
+                            placeholder="Paste a GitHub URL (e.g. https://github.com/torvalds/linux)",
+                            id="git-url-input",
+                        )
+                        yield Button("ANALYZE", id="btn-analyze")
+                    yield RichLog(
+                        id="git-results", highlight=False, markup=True, wrap=True
                     )
 
         with Horizontal(id="settings-bar"):
@@ -329,6 +353,7 @@ class YaketyYak(App):
         self._ai_status = ai_status
         self._ai_desc = ai_desc
         self._show_welcome()
+        self._show_git_placeholder()
 
     def _apply_theme_class(self) -> None:
         screen = self.screen
@@ -344,7 +369,8 @@ class YaketyYak(App):
         trans.write("")
         trans.write("[bold]Get started:[/]")
         trans.write("  Type [bold cyan]try 1[/] to run your first command")
-        trans.write("  Paste a [bold cyan]GitHub URL[/] to analyze any repo")
+        trans.write("  Type [bold cyan]/git owner/repo[/] to analyze a GitHub repo")
+        trans.write("  Press [bold cyan]Ctrl+G[/] to open the Git Translator view")
         trans.write("  Type [bold cyan]help[/] for full instructions")
         trans.write("")
         trans.write("[bold]Try these yourself:[/]")
@@ -354,7 +380,7 @@ class YaketyYak(App):
         trans.write(f"  [cyan]4.[/] [bold]{STARTER_COMMANDS[3][0]}[/] \u2014 {STARTER_COMMANDS[3][1]}")
         trans.write(f"  [cyan]5.[/] [bold]{STARTER_COMMANDS[4][0]}[/] \u2014 {STARTER_COMMANDS[4][1]}")
         trans.write("")
-        trans.write("[dim]Ctrl+B: Toggle Mode  |  Ctrl+T: AI Toggle  |  Ctrl+S: Switch Theme  |  Ctrl+L: Clear Panel  |  Ctrl+Q: Quit App[/]")
+        trans.write("[dim]Ctrl+B: Mode  |  Ctrl+G: Git View  |  Ctrl+T: AI  |  Ctrl+S: Theme  |  Ctrl+L: Clear  |  Ctrl+Q: Quit[/]")
         if not AI_AVAILABLE:
             trans.write("")
             trans.write("[yellow]AI is off \u2014 no AI backend detected.[/]")
@@ -370,6 +396,27 @@ class YaketyYak(App):
             trans.write(f"[dim]Run: ollama pull qwen2.5-coder:1.5b[/]")
         trans.write("[dim]" + "\u2500" * 50 + "[/]")
         self._shown_welcome = True
+
+    def _show_git_placeholder(self) -> None:
+        git_results = self.query_one("#git-results", RichLog)
+        git_results.write("")
+        git_results.write("[bold]Git URL Translator[/]")
+        git_results.write("")
+        git_results.write("Paste a GitHub URL above and click ANALYZE to get a")
+        git_results.write("full breakdown of any repository including:")
+        git_results.write("")
+        git_results.write("  \u2605 Stars, forks, and watchers")
+        git_results.write("  \U0001f4bb Language and license info")
+        git_results.write("  \U0001f4ca Quality score with risk/reward analysis")
+        git_results.write("  \U0001f4c5 Activity and maintenance status")
+        git_results.write("  \U0001f3f7  Topics and metadata")
+        git_results.write("")
+        git_results.write("[dim]Examples:[/]")
+        git_results.write("  [cyan]https://github.com/torvalds/linux[/]")
+        git_results.write("  [cyan]https://github.com/textualize/textual[/]")
+        git_results.write("  [cyan]facebook/react[/]")
+        git_results.write("")
+        git_results.write("[dim]You can also type /git owner/repo in the terminal view.[/]")
 
     def _show_try_list(self) -> None:
         trans = self.query_one("#translation-output", RichLog)
@@ -455,95 +502,134 @@ class YaketyYak(App):
 
     def _calculate_quality_score(self, data):
         score = 0
-        reasons = []
+        risk_flags = []
+        reward_flags = []
 
         stars = data.get("stargazers_count", 0)
-        if stars >= 1000:
+        if stars >= 5000:
             score += 25
-            reasons.append("High star count")
+            reward_flags.append("Highly starred project")
+        elif stars >= 1000:
+            score += 20
+            reward_flags.append("Strong community interest")
         elif stars >= 100:
-            score += 15
-            reasons.append("Good star count")
+            score += 12
+            reward_flags.append("Growing community")
         elif stars >= 10:
-            score += 8
-            reasons.append("Some community interest")
-        else:
-            score += 2
-
-        if data.get("description"):
-            score += 10
-            reasons.append("Has description")
-
-        if data.get("license") and data["license"].get("spdx_id") != "NOASSERTION":
-            score += 10
-            reasons.append("Licensed")
-
-        if not data.get("archived", False):
             score += 5
-            reasons.append("Active (not archived)")
         else:
-            reasons.append("Archived")
+            risk_flags.append("Very low star count \u2014 may be experimental")
 
-        updated = data.get("pushed_at", "")
-        if updated:
+        desc = data.get("description")
+        if desc:
+            score += 5
+            reward_flags.append("Has description")
+        else:
+            risk_flags.append("No description \u2014 purpose unclear")
+
+        license_info = data.get("license")
+        license_name = license_info.get("spdx_id", "Unknown") if license_info else "None"
+        if license_name not in ("None", "Unknown", "NOASSERTION"):
+            score += 10
+            reward_flags.append(f"Licensed ({license_name})")
+        else:
+            risk_flags.append("No license \u2014 legally risky to use")
+
+        days_since_update = None
+        if data.get("pushed_at"):
             try:
-                last_push = datetime.fromisoformat(updated.replace("Z", "+00:00"))
-                days_ago = (datetime.now(timezone.utc) - last_push).days
-                if days_ago < 30:
+                last_push = datetime.fromisoformat(data["pushed_at"].replace("Z", "+00:00"))
+                days_since_update = (datetime.now(timezone.utc) - last_push).days
+                if days_since_update < 30:
                     score += 15
-                    reasons.append("Updated within 30 days")
-                elif days_ago < 180:
+                    reward_flags.append("Actively maintained (updated within 30 days)")
+                elif days_since_update < 90:
                     score += 10
-                    reasons.append("Updated within 6 months")
-                elif days_ago < 365:
+                    reward_flags.append("Recently maintained")
+                elif days_since_update < 365:
                     score += 5
-                    reasons.append("Updated within a year")
+                    risk_flags.append(f"Not updated in {days_since_update} days")
                 else:
-                    reasons.append(f"Last updated {days_ago} days ago")
-            except (ValueError, TypeError):
+                    risk_flags.append(f"Stale \u2014 last updated {days_since_update} days ago")
+            except Exception:
                 pass
 
         forks = data.get("forks_count", 0)
-        if forks >= 100:
+        if forks >= 500:
             score += 10
-            reasons.append("Many forks")
-        elif forks >= 10:
-            score += 5
-            reasons.append("Some forks")
+            reward_flags.append("Heavily forked \u2014 widely used")
+        elif forks >= 50:
+            score += 7
+            reward_flags.append("Good fork count")
+        elif forks >= 5:
+            score += 3
 
         if not data.get("fork", False):
-            score += 5
-            reasons.append("Original repo (not a fork)")
-
-        if data.get("has_wiki"):
             score += 3
-        if data.get("has_issues"):
-            score += 2
+
+        if data.get("archived", False):
+            score -= 15
+            risk_flags.append("Repository is ARCHIVED \u2014 no longer maintained")
+
+        if data.get("fork", False):
+            score -= 5
+            risk_flags.append("This is a fork, not the original")
 
         open_issues = data.get("open_issues_count", 0)
         if open_issues > 500:
             score -= 5
-            reasons.append("Many open issues")
+            risk_flags.append(f"{open_issues:,} open issues \u2014 may have unresolved problems")
+        elif open_issues > 100:
+            risk_flags.append(f"{open_issues:,} open issues")
+
+        if data.get("has_wiki"):
+            score += 2
+        if data.get("has_pages"):
+            score += 2
+            reward_flags.append("Has GitHub Pages site")
 
         score = max(0, min(score, 100))
-        return score, reasons
+
+        if score >= 75:
+            verdict = "Excellent"
+            verdict_color = "green"
+        elif score >= 55:
+            verdict = "Good"
+            verdict_color = "cyan"
+        elif score >= 35:
+            verdict = "Fair"
+            verdict_color = "yellow"
+        else:
+            verdict = "Caution"
+            verdict_color = "red"
+
+        return score, verdict, verdict_color, risk_flags, reward_flags, days_since_update
 
     @work(thread=True)
-    def _analyze_github_repo(self, url_or_repo: str) -> None:
-        trans_out = self.query_one("#translation-output", RichLog)
+    def _analyze_github_repo(self, url_or_repo: str, target: str = "auto") -> None:
+        if target == "auto":
+            if self.current_view == "git":
+                target = "git"
+            else:
+                target = "translation"
+
+        if target == "git":
+            out = self.query_one("#git-results", RichLog)
+        else:
+            out = self.query_one("#translation-output", RichLog)
+
         status = self.query_one("#status-label", Label)
         self.call_from_thread(status.update, "Analyzing repo...")
-        self.call_from_thread(trans_out.write, "")
-        self.call_from_thread(trans_out.write, "[bold magenta][Git Translator][/bold magenta]")
-        self.call_from_thread(trans_out.write, f"[dim]Analyzing: {url_or_repo}[/dim]")
+        self.call_from_thread(out.write, "")
+        self.call_from_thread(out.write, "[bold magenta]\u2500\u2500\u2500 Git URL Translator \u2500\u2500\u2500[/bold magenta]")
+        self.call_from_thread(out.write, f"[dim]Analyzing: {url_or_repo}[/dim]")
 
         owner, repo = self._parse_github_url(url_or_repo)
         if not owner or not repo:
-            self.call_from_thread(trans_out.write, "")
-            self.call_from_thread(trans_out.write, "[red]Could not parse GitHub URL.[/red]")
-            self.call_from_thread(trans_out.write, "[dim]Usage: /git https://github.com/owner/repo[/dim]")
-            self.call_from_thread(trans_out.write, "[dim]   or: /git owner/repo[/dim]")
-            self.call_from_thread(trans_out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
+            self.call_from_thread(out.write, "")
+            self.call_from_thread(out.write, "[red]Could not parse GitHub URL.[/red]")
+            self.call_from_thread(out.write, "[dim]Usage: https://github.com/owner/repo or owner/repo[/dim]")
+            self.call_from_thread(out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
             self.call_from_thread(status.update, "Ready")
             return
 
@@ -556,27 +642,82 @@ class YaketyYak(App):
             with urllib.request.urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read())
         except urllib.error.HTTPError as e:
-            self.call_from_thread(trans_out.write, "")
+            self.call_from_thread(out.write, "")
             if e.code == 404:
-                self.call_from_thread(trans_out.write, f"[red]Repository not found: {owner}/{repo}[/red]")
-                self.call_from_thread(trans_out.write, "[dim]Check the URL and make sure the repo exists and is public.[/dim]")
+                self.call_from_thread(out.write, f"[red]Repository not found: {owner}/{repo}[/red]")
+                self.call_from_thread(out.write, "[dim]Check the URL and make sure the repo exists and is public.[/dim]")
             elif e.code == 403:
-                self.call_from_thread(trans_out.write, f"[red]GitHub API rate limit exceeded.[/red]")
-                self.call_from_thread(trans_out.write, "[dim]Try again in a few minutes.[/dim]")
+                self.call_from_thread(out.write, f"[red]GitHub API rate limit exceeded.[/red]")
+                self.call_from_thread(out.write, "[dim]Try again in a few minutes.[/dim]")
             else:
-                self.call_from_thread(trans_out.write, f"[red]GitHub API error: {e.code}[/red]")
-            self.call_from_thread(trans_out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
+                self.call_from_thread(out.write, f"[red]GitHub API error: {e.code}[/red]")
+            self.call_from_thread(out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
             self.call_from_thread(status.update, "Ready")
             return
         except Exception as e:
-            self.call_from_thread(trans_out.write, "")
-            self.call_from_thread(trans_out.write, f"[red]Network error: {str(e)}[/red]")
-            self.call_from_thread(trans_out.write, "[dim]Check your internet connection.[/dim]")
-            self.call_from_thread(trans_out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
+            self.call_from_thread(out.write, "")
+            self.call_from_thread(out.write, f"[red]Network error: {str(e)}[/red]")
+            self.call_from_thread(out.write, "[dim]Check your internet connection.[/dim]")
+            self.call_from_thread(out.write, "[dim]" + "\u2500" * 50 + "[/dim]")
             self.call_from_thread(status.update, "Ready")
             return
 
-        score, reasons = self._calculate_quality_score(data)
+        contrib_count = 0
+        try:
+            contrib_url = f"https://api.github.com/repos/{owner}/{repo}/contributors?per_page=1&anon=true"
+            req2 = urllib.request.Request(contrib_url, headers={
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "YaketyYak/1.0",
+            })
+            with urllib.request.urlopen(req2, timeout=5) as resp2:
+                link_header = resp2.headers.get("Link", "")
+                if 'rel="last"' in link_header:
+                    m = re.search(r'page=(\d+)>; rel="last"', link_header)
+                    if m:
+                        contrib_count = int(m.group(1))
+                else:
+                    contributors = json.loads(resp2.read())
+                    contrib_count = len(contributors)
+        except Exception:
+            pass
+
+        releases_count = 0
+        try:
+            rel_url = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=1"
+            req3 = urllib.request.Request(rel_url, headers={
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "YaketyYak/1.0",
+            })
+            with urllib.request.urlopen(req3, timeout=5) as resp3:
+                link_header = resp3.headers.get("Link", "")
+                if 'rel="last"' in link_header:
+                    m = re.search(r'page=(\d+)>; rel="last"', link_header)
+                    if m:
+                        releases_count = int(m.group(1))
+                else:
+                    releases = json.loads(resp3.read())
+                    releases_count = len(releases)
+        except Exception:
+            pass
+
+        score, verdict, verdict_color, risk_flags, reward_flags, days_since_update = self._calculate_quality_score(data)
+
+        if releases_count > 0:
+            score = min(score + 5, 100)
+            reward_flags.append(f"{releases_count} release(s) published")
+        else:
+            risk_flags.append("No releases \u2014 may not have stable versions")
+
+        if contrib_count >= 50:
+            score = min(score + 10, 100)
+            reward_flags.append(f"{contrib_count}+ contributors")
+        elif contrib_count >= 10:
+            score = min(score + 7, 100)
+            reward_flags.append(f"{contrib_count} contributors")
+        elif contrib_count >= 2:
+            score = min(score + 3, 100)
+        elif contrib_count == 1:
+            risk_flags.append("Single contributor \u2014 bus factor of 1")
 
         name = data.get("full_name", f"{owner}/{repo}")
         desc = data.get("description") or "No description"
@@ -597,32 +738,38 @@ class YaketyYak(App):
         homepage = data.get("homepage") or ""
 
         if score >= 75:
-            score_color = "green"
-            score_label = "Excellent"
-        elif score >= 50:
-            score_color = "cyan"
-            score_label = "Good"
-        elif score >= 30:
-            score_color = "yellow"
-            score_label = "Fair"
+            verdict_color = "green"
+            verdict = "Excellent"
+            verdict_summary = "Well-maintained, widely used, and safe to integrate."
+        elif score >= 55:
+            verdict_color = "cyan"
+            verdict = "Good"
+            verdict_summary = "Solid project with good fundamentals."
+        elif score >= 35:
+            verdict_color = "yellow"
+            verdict = "Fair"
+            verdict_summary = "Some concerns. Review the risk flags."
         else:
-            score_color = "red"
-            score_label = "Low"
+            verdict_color = "red"
+            verdict = "Caution"
+            verdict_summary = "Significant risks. Evaluate carefully."
 
         def w(text):
-            self.call_from_thread(trans_out.write, text)
+            self.call_from_thread(out.write, text)
 
         w("")
         w(f"[bold]{name}[/bold]")
         w(f"[dim]{desc}[/dim]")
         w("")
-        w(f"  [bold][{score_color}]Quality Score: {score}/100 ({score_label})[/{score_color}][/bold]")
+        w(f"  [{verdict_color}]\u2588\u2588 Quality Score: {score}/100 \u2014 {verdict}[/{verdict_color}]")
+        w(f"  [dim]{verdict_summary}[/dim]")
         w("")
         w(f"  [yellow]\u2605[/yellow] Stars: [bold]{stars:,}[/bold]     \U0001f374 Forks: [bold]{forks:,}[/bold]     \U0001f441 Watchers: [bold]{watchers:,}[/bold]")
         w(f"  \U0001f4bb Language: [bold]{lang}[/bold]     \U0001f4dc License: [bold]{license_name}[/bold]")
         w(f"  \U0001f4c5 Created: {created}     \U0001f504 Last push: {updated}")
         w(f"  \U0001f333 Default branch: {default_branch}     \U0001f4e6 Size: {size_kb:,} KB")
-        w(f"  \U0001f41b Open issues: {open_issues:,}")
+        w(f"  \U0001f41b Open issues: {open_issues:,}     \U0001f465 Contributors: {contrib_count}")
+        w(f"  \U0001f4e6 Releases: {releases_count}")
 
         flags = []
         if is_fork:
@@ -637,8 +784,19 @@ class YaketyYak(App):
         if homepage:
             w(f"  Homepage: [dim]{homepage}[/dim]")
 
+        if reward_flags:
+            w("")
+            w("  [green][bold]\u2713 Strengths:[/bold][/green]")
+            for flag in reward_flags:
+                w(f"    [green]\u2713[/green] {flag}")
+
+        if risk_flags:
+            w("")
+            w("  [yellow][bold]\u26a0 Risks:[/bold][/yellow]")
+            for flag in risk_flags:
+                w(f"    [yellow]\u26a0[/yellow] {flag}")
+
         w("")
-        w(f"  [dim]Score breakdown: {', '.join(reasons[:5])}[/dim]")
         w(f"  [dim]{api_url.replace('api.github.com/repos', 'github.com')}[/dim]")
         w("[dim]" + "\u2500" * 50 + "[/dim]")
         self.call_from_thread(status.update, "Ready")
@@ -757,6 +915,48 @@ class YaketyYak(App):
                 self._last_command = command
                 self.shell.send_line(command)
 
+        elif event.input.id == "git-url-input":
+            url = event.value.strip()
+            if url:
+                self._analyze_github_repo(url, target="git")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "btn-terminal-view":
+            self._switch_view("terminal")
+        elif event.button.id == "btn-git-view":
+            self._switch_view("git")
+        elif event.button.id == "btn-analyze":
+            git_input = self.query_one("#git-url-input", Input)
+            url = git_input.value.strip()
+            if url:
+                self._analyze_github_repo(url, target="git")
+
+    def _switch_view(self, view: str) -> None:
+        self.current_view = view
+        main_container = self.query_one("#main-container")
+        git_container = self.query_one("#git-container")
+        btn_terminal = self.query_one("#btn-terminal-view", Button)
+        btn_git = self.query_one("#btn-git-view", Button)
+
+        if view == "git":
+            main_container.add_class("hidden")
+            git_container.add_class("active")
+            btn_terminal.remove_class("active-view")
+            btn_terminal.label = "Terminal"
+            btn_git.add_class("active-view")
+            btn_git.label = "\u25b6 Git Translator"
+            git_input = self.query_one("#git-url-input", Input)
+            git_input.focus()
+        else:
+            main_container.remove_class("hidden")
+            git_container.remove_class("active")
+            btn_terminal.add_class("active-view")
+            btn_terminal.label = "\u25b6 Terminal"
+            btn_git.remove_class("active-view")
+            btn_git.label = "Git Translator"
+            shell_input = self.query_one("#shell-input", Input)
+            shell_input.focus()
+
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.select.id == "mode-select":
             self.mode = event.value
@@ -770,6 +970,7 @@ class YaketyYak(App):
         if mode_name in ("intermediate", "advanced"):
             new_bindings = [
                 Binding("ctrl+b", "toggle_mode", "Mode", key_display="^B"),
+                Binding("ctrl+g", "toggle_view", "Git", key_display="^G"),
                 Binding("ctrl+t", "toggle_ai", "AI", key_display="^T"),
                 Binding("ctrl+l", "clear_translations", "Clear", key_display="^L"),
                 Binding("ctrl+s", "toggle_theme", "Theme", key_display="^S"),
@@ -778,6 +979,7 @@ class YaketyYak(App):
         else:
             new_bindings = [
                 Binding("ctrl+b", "toggle_mode", "Toggle Mode", key_display="Ctrl+B"),
+                Binding("ctrl+g", "toggle_view", "Git Translator", key_display="Ctrl+G"),
                 Binding("ctrl+t", "toggle_ai", "AI Toggle", key_display="Ctrl+T"),
                 Binding("ctrl+l", "clear_translations", "Clear Panel", key_display="Ctrl+L"),
                 Binding("ctrl+s", "toggle_theme", "Switch Theme", key_display="Ctrl+S"),
@@ -810,6 +1012,12 @@ class YaketyYak(App):
         status = self.query_one("#status-label", Label)
         status.update(f"Mode: {self.mode.title()}")
 
+    def action_toggle_view(self) -> None:
+        if self.current_view == "terminal":
+            self._switch_view("git")
+        else:
+            self._switch_view("terminal")
+
     def action_toggle_ai(self) -> None:
         self.use_ai = not self.use_ai
         ai_label = self.query_one("#ai-label", Label)
@@ -835,9 +1043,14 @@ class YaketyYak(App):
             self._debounce_task.cancel()
             self._debounce_task = None
         self._translation_id += 1
-        trans = self.query_one("#translation-output", RichLog)
-        trans.clear()
-        trans.write("[dim]Translation panel cleared. Type a command to continue.[/]")
+        if self.current_view == "git":
+            git_results = self.query_one("#git-results", RichLog)
+            git_results.clear()
+            git_results.write("[dim]Git results cleared. Paste a URL to analyze.[/]")
+        else:
+            trans = self.query_one("#translation-output", RichLog)
+            trans.clear()
+            trans.write("[dim]Translation panel cleared. Type a command to continue.[/]")
 
     def on_unmount(self) -> None:
         if self.shell:
