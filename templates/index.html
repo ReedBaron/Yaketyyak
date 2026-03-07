@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yakety Yak — Understand Every Command</title>
+    <meta name="description" content="A split-pane terminal that explains commands and output in plain language as you type. Free, open source, works offline.">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=11">
+</head>
+<body>
+
+    <canvas id="matrix-rain"></canvas>
+    <div class="grain"></div>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="#" class="logo">
+                <img src="/static/yak-wordmark.png" alt="YaketyYak" class="logo-wordmark">
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#download">Download</a>
+                <a href="https://github.com/myiephero/Yaketyyak" target="_blank" rel="noopener" class="nav-github">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span class="nav-star-count" id="nav-stars">Star</span>
+                </a>
+            </div>
+            <a href="#download" class="btn btn-sm btn-primary nav-cta">Download Free</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Free &amp; Open Source
+                </div>
+                <h1>
+                    Stop Googling<br>
+                    terminal commands.
+                </h1>
+                <p class="hero-sub">
+                    A split-pane terminal that explains everything happening
+                    on screen — commands, output, and errors — in plain language, as you type.
+                </p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn btn-primary btn-lg">
+                        <span>Download for Free</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
+                </div>
+                <div class="hero-meta">
+                    <span>macOS</span>
+                    <span class="meta-dot"></span>
+                    <span>Linux</span>
+                    <span class="meta-dot"></span>
+                    <span>WSL</span>
+                    <span class="meta-dot"></span>
+                    <span>~24 MB</span>
+                </div>
+                <a href="https://github.com/myiephero/Yaketyyak" target="_blank" rel="noopener" class="github-star-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>Star on GitHub</span>
+                    <span class="star-divider"></span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span id="hero-stars">0</span>
+                </a>
+            </div>
+
+            <div class="terminal-window" id="terminal-demo">
+                <div class="terminal-chrome">
+                    <div class="chrome-dots">
+                        <span class="dot dot-r"></span>
+                        <span class="dot dot-y"></span>
+                        <span class="dot dot-g"></span>
+                    </div>
+                    <span class="chrome-title">Yakety Yak</span>
+                    <div class="chrome-controls">
+                        <span class="mode-pill">Beginner Mode</span>
+                    </div>
+                </div>
+                <div class="terminal-body">
+                    <div class="pane pane-shell">
+                        <div class="pane-header">
+                            <span class="pane-tag">SHELL</span>
+                        </div>
+                        <div class="pane-content" id="shell-content">
+                            <div class="line"><span class="ps1">~$</span> <span class="typed-cmd" data-cmd="ls -la"></span></div>
+                        </div>
+                    </div>
+                    <div class="pane-divider"></div>
+                    <div class="pane pane-explain">
+                        <div class="pane-header">
+                            <span class="pane-tag tag-green">TRANSLATION</span>
+                        </div>
+                        <div class="pane-content" id="explain-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="tech-stack">
+        <div class="container">
+            <div class="section-label">Tech Stack</div>
+            <h2 class="section-title">Built different.</h2>
+            <p class="section-sub">No Electron. No browser engine. No web wrapper. Pure Python, native terminal, real performance.</p>
+
+            <h3 class="stack-group-label">Development Platform</h3>
+            <div class="stack-grid">
+                <div class="stack-card stack-card-hero card-reveal">
+                    <div class="stack-icon stack-icon-replit">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    </div>
+                    <h3>Replit</h3>
+                    <p class="stack-role">Dev Environment &amp; Hosting</p>
+                    <p class="stack-desc">Full cloud IDE with AI agent, Nix-based packages, and instant deploys. The entire project was built and hosted here.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    </div>
+                    <h3>GitHub</h3>
+                    <p class="stack-role">Source &amp; Releases</p>
+                    <p class="stack-desc">Open-source repo, issue tracking, and release hosting. GitHub Actions builds every tagged release automatically.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h3>Nix</h3>
+                    <p class="stack-role">System Packages</p>
+                    <p class="stack-desc">Reproducible system dependencies via Replit's Nix channel. FreeType, zlib, Tcl/Tk, and image libraries all pinned.</p>
+                </div>
+            </div>
+
+            <h3 class="stack-group-label">Application Core</h3>
+            <div class="stack-grid">
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    </div>
+                    <h3>Python 3.11</h3>
+                    <p class="stack-role">Core Runtime</p>
+                    <p class="stack-desc">The entire app — TUI, translator, knowledge base, build system — is pure Python. No compiled extensions.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h3>Textual</h3>
+                    <p class="stack-role">TUI Framework</p>
+                    <p class="stack-desc">Rich terminal UI framework by Textualize. Split panes, reactive widgets, CSS-like styling, and 60fps rendering.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    </div>
+                    <h3>PTY + pexpect</h3>
+                    <p class="stack-role">Shell Integration</p>
+                    <p class="stack-desc">Real pseudo-terminal via Python's pty module and pexpect. Commands run on the actual system — not a sandbox.</p>
+                </div>
+            </div>
+
+            <h3 class="stack-group-label">AI Layer</h3>
+            <div class="stack-grid">
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </div>
+                    <h3>Knowledge Base</h3>
+                    <p class="stack-role">Tier 1 &mdash; Instant</p>
+                    <p class="stack-desc">507 commands and 52 error patterns in a hand-built dictionary. Sub-millisecond lookups, zero dependencies.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M12 19v3"/><path d="M8 22h8"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+                    </div>
+                    <h3>Ollama</h3>
+                    <p class="stack-role">Tier 2 &mdash; Local AI</p>
+                    <p class="stack-desc">Runs Qwen2.5-Coder locally on your machine. Auto-installs on first use. Your data never leaves your computer.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <h3>OpenAI (GPT-5)</h3>
+                    <p class="stack-role">Tier 3 &mdash; Cloud AI</p>
+                    <p class="stack-desc">Optional fallback. BYO API key for the most advanced explanations. Only called when local AI can't answer.</p>
+                </div>
+            </div>
+
+            <h3 class="stack-group-label">Landing Page</h3>
+            <div class="stack-grid">
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3>Flask</h3>
+                    <p class="stack-role">Web Server</p>
+                    <p class="stack-desc">Lightweight Python web framework serving the landing page. Jinja2 templates, static assets, zero JavaScript frameworks.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                    </div>
+                    <h3>Vanilla CSS + JS</h3>
+                    <p class="stack-role">Frontend</p>
+                    <p class="stack-desc">No React. No Tailwind. No build step. Hand-written CSS with custom properties, canvas animations, and vanilla JavaScript.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    </div>
+                    <h3>GitHub API</h3>
+                    <p class="stack-role">Live Data</p>
+                    <p class="stack-desc">Real-time star count and release downloads fetched from the GitHub API. Live links to release artifacts.</p>
+                </div>
+            </div>
+
+            <h3 class="stack-group-label">Build &amp; Distribution</h3>
+            <div class="stack-grid">
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <h3>PyInstaller</h3>
+                    <p class="stack-role">Binary Compiler</p>
+                    <p class="stack-desc">Bundles the entire Python app into a single standalone executable. No Python install needed on the user's machine.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>GitHub Actions</h3>
+                    <p class="stack-role">CI/CD Pipeline</p>
+                    <p class="stack-desc">Automated matrix builds for macOS and Linux on every git tag. Four artifacts published to GitHub Releases.</p>
+                </div>
+
+                <div class="stack-card card-reveal">
+                    <div class="stack-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <h3>Pillow</h3>
+                    <p class="stack-role">Asset Generation</p>
+                    <p class="stack-desc">Generates app icons, favicons, and macOS .icns files during the build process. Handles all image processing.</p>
+                </div>
+            </div>
+
+            <div class="stack-stats">
+                <div class="stack-stat">
+                    <span class="stack-stat-value">0</span>
+                    <span class="stack-stat-label">Electron</span>
+                </div>
+                <div class="stack-stat">
+                    <span class="stack-stat-value">0</span>
+                    <span class="stack-stat-label">npm packages</span>
+                </div>
+                <div class="stack-stat">
+                    <span class="stack-stat-value">0</span>
+                    <span class="stack-stat-label">React / Vue / Angular</span>
+                </div>
+                <div class="stack-stat">
+                    <span class="stack-stat-value">~4k</span>
+                    <span class="stack-stat-label">Lines of Python</span>
+                </div>
+                <div class="stack-stat">
+                    <span class="stack-stat-value">1</span>
+                    <span class="stack-stat-label">Single binary</span>
+                </div>
+                <div class="stack-stat">
+                    <span class="stack-stat-value">24 MB</span>
+                    <span class="stack-stat-label">Total size</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-label">Features</div>
+            <h2 class="section-title">Everything you need to<br>feel at home in the terminal.</h2>
+            <p class="section-sub">No prior experience required. Just open it and start typing.</p>
+
+            <div class="feature-bento">
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    </div>
+                    <h3>Real shell. Real results.</h3>
+                    <p>Not a sandbox. Your commands run on your actual system with a real PTY. Files you create, errors you see, and outputs you get are all real.</p>
+                </div>
+
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    </div>
+                    <h3>Git Translator.</h3>
+                    <p>Paste any GitHub URL to get a full risk/reward analysis — stars, forks, license, contributors, and a quality score out of 100 — before you clone.</p>
+                </div>
+
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </div>
+                    <h3>507 commands. Under 1ms.</h3>
+                    <p>The built-in knowledge base explains 507 commands and 52 error patterns in under a millisecond — no internet, no AI, no waiting.</p>
+                </div>
+
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M12 19v3"/><path d="M8 22h8"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+                    </div>
+                    <h3>Three-tier AI. Local first.</h3>
+                    <p>Knowledge base fires first. If it can't answer, local AI (Ollama) takes over on your machine. Cloud AI is the last resort — and only if you enable it.</p>
+                </div>
+
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon icon-glow">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <h3>4 skill modes. 25 starter commands.</h3>
+                    <p>From Noob (full hand-holding with analogies) to Advanced (terse, expert-only). Type <code>try 1</code> through <code>try 25</code> for safe, guided commands that teach you step by step.</p>
+                </div>
+
+                <div class="bento-card card-reveal">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h3>Private. Themed. Yours.</h3>
+                    <p>No accounts, no tracking, no telemetry, no fees, no API keys, no tokens — no yakety yak. Switch between Terminal and Glass themes with <code>Ctrl+S</code>.</p>
+                    <div class="privacy-stack-compact">
+                        <span class="p-pill">No account</span>
+                        <span class="p-pill">No telemetry</span>
+                        <span class="p-pill">No fees</span>
+                        <span class="p-pill">Fully offline</span>
+                    </div>
+                    <div class="theme-pills">
+                        <span class="theme-pill theme-pill-green"><span class="theme-pill-dot green-dot"></span>Terminal</span>
+                        <span class="theme-pill theme-pill-purple"><span class="theme-pill-dot purple-dot"></span>Glass</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-dark" id="themes">
+        <div class="container">
+            <div class="section-label">Two Styles</div>
+            <h2 class="section-title">Your terminal, your aesthetic.</h2>
+            <p class="section-sub">Switch between themes instantly with Ctrl+S. Your choice is remembered.</p>
+
+            <div class="theme-toggle-bar">
+                <button class="theme-tab active" data-theme="terminal" onclick="switchThemePreview('terminal')">
+                    <span class="tab-dot tab-dot-green"></span>
+                    Terminal
+                </button>
+                <button class="theme-tab" data-theme="glass" onclick="switchThemePreview('glass')">
+                    <span class="tab-dot tab-dot-purple"></span>
+                    Glass
+                </button>
+            </div>
+
+            <div class="theme-showcase">
+                <div class="theme-preview theme-preview-terminal active" id="preview-terminal">
+                    <div class="tp-window tp-terminal-style">
+                        <div class="tp-chrome">
+                            <span class="dot dot-r"></span>
+                            <span class="dot dot-y"></span>
+                            <span class="dot dot-g"></span>
+                            <span class="tp-title">Yakety Yak</span>
+                            <span class="tp-pill tp-pill-green">Terminal Theme</span>
+                        </div>
+                        <div class="tp-body">
+                            <div class="tp-pane tp-pane-left tp-bg-dark">
+                                <div class="tp-bar tp-bar-green">SHELL</div>
+                                <div class="tp-content">
+                                    <div><span class="tp-ps1-green">~$</span> ls -la</div>
+                                    <div class="tp-dim">drwxr-xr-x  5 user staff 160</div>
+                                    <div class="tp-dim">-rw-r--r--  1 user staff 2048 app.py</div>
+                                    <div><span class="tp-ps1-green">~$</span> git status</div>
+                                    <div class="tp-dim">On branch main</div>
+                                    <div class="tp-dim">&nbsp;&nbsp;modified: app.py</div>
+                                </div>
+                            </div>
+                            <div class="tp-pane tp-bg-dark">
+                                <div class="tp-bar tp-bar-green">TRANSLATION</div>
+                                <div class="tp-content">
+                                    <div class="tp-explain tp-explain-green">
+                                        <span class="tp-tag tp-tag-green">[Local KB]</span>
+                                        <p>This lists all files and folders with details. The letters like "drwxr-xr-x" show permissions.</p>
+                                    </div>
+                                    <div class="tp-explain tp-explain-green">
+                                        <span class="tp-tag tp-tag-green">[Local KB]</span>
+                                        <p>You have changes to app.py that haven't been saved to git yet.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tp-status tp-status-dark">
+                            <span>Mode: Beginner</span>
+                            <span>AI: ON</span>
+                            <span class="tp-accent-green">Theme: Terminal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theme-preview theme-preview-glass" id="preview-glass">
+                    <div class="tp-window tp-glass-style">
+                        <div class="tp-chrome tp-chrome-glass">
+                            <span class="dot dot-r"></span>
+                            <span class="dot dot-y"></span>
+                            <span class="dot dot-g"></span>
+                            <span class="tp-title">Yakety Yak</span>
+                            <span class="tp-pill tp-pill-purple">Glass Theme</span>
+                        </div>
+                        <div class="tp-body">
+                            <div class="tp-pane tp-pane-left tp-bg-glass">
+                                <div class="tp-bar tp-bar-purple">SHELL</div>
+                                <div class="tp-content">
+                                    <div><span class="tp-ps1-purple">~$</span> ls -la</div>
+                                    <div class="tp-dim-glass">drwxr-xr-x  5 user staff 160</div>
+                                    <div class="tp-dim-glass">-rw-r--r--  1 user staff 2048 app.py</div>
+                                    <div><span class="tp-ps1-purple">~$</span> git status</div>
+                                    <div class="tp-dim-glass">On branch main</div>
+                                    <div class="tp-dim-glass">&nbsp;&nbsp;modified: app.py</div>
+                                </div>
+                            </div>
+                            <div class="tp-pane tp-bg-glass">
+                                <div class="tp-bar tp-bar-purple">TRANSLATION</div>
+                                <div class="tp-content">
+                                    <div class="tp-explain tp-explain-purple">
+                                        <span class="tp-tag tp-tag-purple">[Local KB]</span>
+                                        <p>This lists all files and folders with details. The letters like "drwxr-xr-x" show permissions.</p>
+                                    </div>
+                                    <div class="tp-explain tp-explain-purple">
+                                        <span class="tp-tag tp-tag-purple">[Local KB]</span>
+                                        <p>You have changes to app.py that haven't been saved to git yet.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tp-status tp-status-glass">
+                            <span>Mode: Beginner</span>
+                            <span>AI: ON</span>
+                            <span class="tp-accent-purple">Theme: Glass</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <div class="section-label">How It Works</div>
+            <h2 class="section-title">Running in 60 seconds.</h2>
+            <p class="section-sub">No configuration. No installer. No terminal experience needed.</p>
+
+            <div class="steps-track">
+                <div class="step-card card-reveal">
+                    <div class="step-num">01</div>
+                    <h3>Download</h3>
+                    <p>Pick Lite or Full edition. It's a single file — drag it wherever you want.</p>
+                </div>
+                <div class="step-connector">
+                    <svg width="40" height="2"><line x1="0" y1="1" x2="40" y2="1" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 4"/></svg>
+                </div>
+                <div class="step-card card-reveal">
+                    <div class="step-num">02</div>
+                    <h3>Open</h3>
+                    <p>Double-click. On Mac it opens Terminal automatically. On Linux it shows in your app menu.</p>
+                </div>
+                <div class="step-connector">
+                    <svg width="40" height="2"><line x1="0" y1="1" x2="40" y2="1" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 4"/></svg>
+                </div>
+                <div class="step-card card-reveal">
+                    <div class="step-num">03</div>
+                    <h3>Learn</h3>
+                    <p>Type <code>try 1</code> to run your first command. The right panel explains everything in plain language.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="download">
+        <div class="container">
+            <div class="section-label">Download</div>
+            <h2 class="section-title">Pick your power level.</h2>
+            <p class="section-sub">Both editions are free and open source. Both work offline. The difference is how smart the explanations get.</p>
+
+            <div class="pricing-grid">
+                <div class="price-card card-reveal">
+                    <div class="price-icon-row">
+                        <div class="price-icon-circle">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        </div>
+                    </div>
+                    <div class="price-header">
+                        <span class="price-name">Lite</span>
+                        <span class="price-tag">Free</span>
+                    </div>
+                    <p class="price-tagline">The knowledge base powerhouse.</p>
+                    <p class="price-desc">507 commands and 52 error patterns explained in under 1ms. No internet, no AI, no waiting. Perfect for learning the basics fast.</p>
+
+                    <div class="price-stats">
+                        <div class="price-stat">
+                            <span class="stat-value">507</span>
+                            <span class="stat-label">commands</span>
+                        </div>
+                        <div class="price-stat">
+                            <span class="stat-value">52</span>
+                            <span class="stat-label">error patterns</span>
+                        </div>
+                        <div class="price-stat">
+                            <span class="stat-value">&lt;1ms</span>
+                            <span class="stat-label">response</span>
+                        </div>
+                    </div>
+
+                    <ul class="price-features">
+                        <li>4 skill modes (Noob to Advanced)</li>
+                        <li>25 guided starter commands</li>
+                        <li>Git Translator with risk/reward scoring</li>
+                        <li>Terminal + Glass themes</li>
+                        <li>Works 100% offline — zero config</li>
+                        <li>Add your own API key for cloud AI later</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline btn-full download-btn" data-edition="lite">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download Lite
+                        <span class="btn-sub">~24 MB</span>
+                    </a>
+                    <p class="price-footer">Single file. No installer. No runtime.</p>
+                </div>
+
+                <div class="price-card price-card-pop card-reveal">
+                    <div class="pop-label">Recommended</div>
+                    <div class="price-icon-row">
+                        <div class="price-icon-circle price-icon-pop">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
+                    </div>
+                    <div class="price-header">
+                        <span class="price-name">Full + AI</span>
+                        <span class="price-tag price-tag-glow">Free</span>
+                    </div>
+                    <p class="price-tagline">Understands <em>everything.</em></p>
+                    <p class="price-desc">Everything in Lite, plus a local AI that runs on your machine. Explains any command, any error, any output — even obscure ones the knowledge base hasn't seen.</p>
+
+                    <div class="price-stats">
+                        <div class="price-stat">
+                            <span class="stat-value stat-inf">&infin;</span>
+                            <span class="stat-label">commands</span>
+                        </div>
+                        <div class="price-stat">
+                            <span class="stat-value stat-inf">&infin;</span>
+                            <span class="stat-label">error patterns</span>
+                        </div>
+                        <div class="price-stat">
+                            <span class="stat-value">8</span>
+                            <span class="stat-label">languages</span>
+                        </div>
+                    </div>
+
+                    <ul class="price-features">
+                        <li>Everything in Lite</li>
+                        <li>Ollama auto-installs for you</li>
+                        <li>Qwen2.5-Coder model (code-focused)</li>
+                        <li>Explains ANY command, output, or error</li>
+                        <li>Translate explanations to 8 languages</li>
+                        <li>100% local — your data never leaves</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full download-btn" data-edition="full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download Full + AI
+                        <span class="btn-sub">~24 MB app + ~1 GB model</span>
+                    </a>
+                    <p class="price-footer">Ollama installs automatically on first run.</p>
+                </div>
+            </div>
+
+            <div class="install-steps card-reveal">
+                <div class="install-steps-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    <span>First launch on macOS</span>
+                </div>
+                <p class="install-steps-desc">macOS blocks apps from unidentified developers by default. Here's how to open Yakety Yak:</p>
+                <ol class="install-steps-list">
+                    <li><strong>Unzip</strong> the download — you'll see <code>Yakety Yak.app</code></li>
+                    <li><strong>Drag</strong> it into your <code>/Applications</code> folder</li>
+                    <li><strong>Right-click</strong> (or Control-click) the app and choose <strong>Open</strong></li>
+                    <li>Click <strong>Open</strong> in the dialog that appears</li>
+                </ol>
+                <p class="install-steps-note">You only need to do this once. After that, it opens normally from your dock.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-dark" id="requirements">
+        <div class="container">
+            <div class="section-label">System Requirements</div>
+            <h2 class="section-title">Almost none.</h2>
+            <p class="section-sub">If your computer can open a terminal, it can run Yakety Yak. No installs, no dependencies, no setup wizards.</p>
+
+            <div class="no-need-bar card-reveal">
+                <span class="no-need-label">You don't need:</span>
+                <span class="no-need-item">Python</span>
+                <span class="no-need-item">Node.js</span>
+                <span class="no-need-item">admin access</span>
+                <span class="no-need-item">an API key</span>
+                <span class="no-need-item">an account</span>
+                <span class="no-need-item">internet</span>
+            </div>
+
+            <div class="req-grid">
+                <div class="req-card card-reveal">
+                    <div class="req-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <h4>macOS</h4>
+                    <p>Catalina (10.15) or later. Download the .zip, unzip, double-click.</p>
+                </div>
+                <div class="req-card card-reveal">
+                    <div class="req-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h4>Linux</h4>
+                    <p>Ubuntu 20.04+, Fedora 34+, or equivalent. Extract the .tar.gz and run.</p>
+                </div>
+                <div class="req-card card-reveal">
+                    <div class="req-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>
+                    </div>
+                    <h4>Windows</h4>
+                    <p>Windows 10/11 with WSL installed. Run the Linux binary inside WSL.</p>
+                </div>
+                <div class="req-card card-reveal">
+                    <div class="req-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <h4>Storage</h4>
+                    <p>24 MB for Lite. ~1.2 GB if you add local AI. That's it.</p>
+                </div>
+            </div>
+
+            <div class="friction-note card-reveal">
+                <p>Yakety Yak is a single standalone file. No installer. No runtime. No config files. Download it, open it, start learning. If you want AI later, it auto-installs Ollama for you.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="container">
+            <div class="cta-glow"></div>
+            <h2>Stop Googling.<br>Start understanding.</h2>
+            <p>Free. Open source. No account needed. Works offline out of the box.</p>
+            <div class="cta-buttons">
+                <a href="#download" class="btn btn-primary btn-lg">Download Yakety Yak</a>
+                <a href="https://github.com/myiephero/Yaketyyak" target="_blank" rel="noopener" class="btn btn-outline btn-lg cta-github-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span>View Source</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-inner">
+            <span class="footer-logo"><img src="/static/yak-wordmark.png" alt="YaketyYak" class="footer-wordmark"></span>
+            <span class="footer-tagline">Made for new coders, vibe coders, and anyone intimidated by the command line.</span>
+            <a href="https://github.com/myiephero/Yaketyyak" target="_blank" rel="noopener" class="footer-github">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="notify-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="document.getElementById('notify-modal').classList.remove('active')">&times;</button>
+            <div class="modal-icon">&#128640;</div>
+            <h3>Coming Soon</h3>
+            <p>We're putting the finishing touches on the <strong id="notify-edition">Lite</strong> Edition download.</p>
+            <p class="modal-sub">Star the repo or check back shortly.</p>
+            <button onclick="document.getElementById('notify-modal').classList.remove('active')" class="btn btn-outline btn-full">Got it</button>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var REPO = 'myiephero/Yaketyyak';
+        var RELEASE_BASE = 'https://github.com/' + REPO + '/releases/latest/download/';
+        var RELEASES_PAGE = 'https://github.com/' + REPO + '/releases/latest';
+
+        function getOS() {
+            var ua = navigator.userAgent || navigator.platform || '';
+            if (/Mac/i.test(ua)) return 'macOS';
+            if (/Linux/i.test(ua)) return 'Linux';
+            return 'other';
+        }
+
+        function getDownloadURL(edition) {
+            var os = getOS();
+            if (os === 'macOS') {
+                return RELEASE_BASE + 'YaketyYak-' + (edition === 'full' ? 'Full' : 'Lite') + '-macOS.zip';
+            } else if (os === 'Linux') {
+                return RELEASE_BASE + 'YaketyYak-' + (edition === 'full' ? 'Full' : 'Lite') + '-Linux.tar.gz';
+            }
+            return RELEASES_PAGE;
+        }
+
+        var os = getOS();
+        document.querySelectorAll('.download-btn').forEach(function(btn) {
+            var edition = btn.getAttribute('data-edition');
+            var sub = btn.querySelector('.btn-sub');
+            if (os === 'macOS' && sub) {
+                sub.textContent = edition === 'full' ? '.zip — ~24 MB app + ~1 GB model' : '.zip — ~24 MB';
+            } else if (os === 'Linux' && sub) {
+                sub.textContent = edition === 'full' ? '.tar.gz — ~24 MB app + ~1 GB model' : '.tar.gz — ~24 MB';
+            }
+        });
+
+        document.querySelectorAll('.download-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var edition = this.getAttribute('data-edition');
+                window.location.href = getDownloadURL(edition);
+            });
+        });
+
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.card-reveal').forEach(function(el) {
+            observer.observe(el);
+        });
+
+        var demoScenes = [
+            {
+                cmd: 'ls -la',
+                output: [
+                    'total 48',
+                    'drwxr-xr-x  5 user staff 160 Mar 6 .',
+                    '-rw-r--r--  1 user staff 2048 app.py',
+                    'drwxr-xr-x  3 user staff  96 src/'
+                ],
+                tag: 'Local KB',
+                tagClass: 'tag-green',
+                explain: 'This lists all files and folders in detail. The letters like "drwxr-xr-x" show permissions — who can read, write, or run each file. You own these files (user/staff).'
+            },
+            {
+                cmd: 'git status',
+                output: [
+                    'On branch main',
+                    'Changes not staged for commit:',
+                    '  modified: app.py',
+                    '  modified: style.css'
+                ],
+                tag: 'Local KB',
+                tagClass: 'tag-green',
+                explain: 'You have changes to app.py and style.css that haven\'t been saved to git yet. Run "git add ." then "git commit -m your message" to save them.'
+            },
+            {
+                cmd: 'pip install flask',
+                output: [
+                    'ERROR: Could not find a version',
+                    'that satisfies the requirement',
+                    'flask (from versions: none)'
+                ],
+                isError: true,
+                tag: 'Ollama AI',
+                tagClass: 'tag-blue',
+                explain: 'The package "flask" can\'t be found for your Python version. This usually means pip is pointing to the wrong Python. Try: pip3 install flask — or: python3 -m pip install flask'
+            },
+            {
+                cmd: 'chmod +x deploy.sh',
+                output: [],
+                tag: 'Local KB',
+                tagClass: 'tag-green',
+                explain: 'This makes the file "deploy.sh" executable — meaning you can now run it as a program by typing ./deploy.sh. Without this, the system would refuse to run the script.'
+            }
+        ];
+
+        var shellEl = document.getElementById('shell-content');
+        var explainEl = document.getElementById('explain-content');
+        var sceneIndex = 0;
+        var isRunning = false;
+
+        function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+        async function typeText(el, text, speed) {
+            for (var i = 0; i < text.length; i++) {
+                el.textContent += text[i];
+                await sleep(speed || 45);
+            }
+        }
+
+        async function runScene(scene) {
+            var cmdLine = document.createElement('div');
+            cmdLine.className = 'line';
+            cmdLine.innerHTML = '<span class="ps1">~$</span> <span class="typed-text"></span><span class="cursor">|</span>';
+            shellEl.appendChild(cmdLine);
+
+            var typedSpan = cmdLine.querySelector('.typed-text');
+            await typeText(typedSpan, scene.cmd, 50);
+
+            var cursorEl = cmdLine.querySelector('.cursor');
+            if (cursorEl) cursorEl.remove();
+
+            await sleep(300);
+
+            for (var i = 0; i < scene.output.length; i++) {
+                var outLine = document.createElement('div');
+                outLine.className = 'line out' + (scene.isError ? ' err' : '');
+                outLine.textContent = scene.output[i];
+                shellEl.appendChild(outLine);
+                await sleep(80);
+            }
+
+            await sleep(400);
+
+            var explainBlock = document.createElement('div');
+            explainBlock.className = 'explain-block fade-in';
+            explainBlock.innerHTML = '<span class="ex-tag ' + scene.tagClass + '">' + scene.tag + '</span>';
+            var explainP = document.createElement('p');
+            explainBlock.appendChild(explainP);
+            explainEl.appendChild(explainBlock);
+
+            await typeText(explainP, scene.explain, 12);
+        }
+
+        async function runDemo() {
+            if (isRunning) return;
+            isRunning = true;
+
+            while (true) {
+                shellEl.innerHTML = '';
+                explainEl.innerHTML = '';
+
+                for (var i = 0; i < demoScenes.length; i++) {
+                    await runScene(demoScenes[i]);
+                    await sleep(2000);
+                }
+
+                await sleep(3000);
+            }
+        }
+
+        var termObs = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                runDemo();
+                termObs.disconnect();
+            }
+        }, { threshold: 0.3 });
+        termObs.observe(document.getElementById('terminal-demo'));
+
+        window.switchThemePreview = function(theme) {
+            document.querySelectorAll('.theme-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelector('.theme-tab[data-theme="' + theme + '"]').classList.add('active');
+            document.querySelectorAll('.theme-preview').forEach(function(p) { p.classList.remove('active'); });
+            document.getElementById('preview-' + theme).classList.add('active');
+        };
+
+        document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        (function fetchStars() {
+            fetch('https://api.github.com/repos/myiephero/Yaketyyak')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var count = data.stargazers_count || 0;
+                    var heroEl = document.getElementById('hero-stars');
+                    var navEl = document.getElementById('nav-stars');
+                    if (heroEl) heroEl.textContent = count;
+                    if (navEl) navEl.textContent = count > 0 ? count : 'Star';
+                })
+                .catch(function() {});
+        })();
+
+        (function initMatrix() {
+            var canvas = document.getElementById('matrix-rain');
+            if (!canvas) return;
+
+            var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reducedMotion) {
+                canvas.style.display = 'none';
+                return;
+            }
+
+            var ctx = canvas.getContext('2d');
+            var chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン{}[]<>/\\|=+-_~`$#@&*;:,.!?gitpushpullcommitclonefetchmerge';
+            var fontSize = 14;
+            var columns;
+            var drops;
+            var animId = null;
+            var frameCount = 0;
+            var isMobile = window.innerWidth < 768;
+            var frameSkip = isMobile ? 3 : 1;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                isMobile = window.innerWidth < 768;
+                frameSkip = isMobile ? 3 : 1;
+                columns = Math.floor(canvas.width / fontSize);
+                drops = [];
+                for (var i = 0; i < columns; i++) {
+                    drops[i] = Math.random() * -100;
+                }
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+
+            function draw() {
+                animId = requestAnimationFrame(draw);
+                frameCount++;
+                if (frameCount % frameSkip !== 0) return;
+
+                ctx.fillStyle = 'rgba(5, 8, 16, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = fontSize + 'px monospace';
+
+                for (var i = 0; i < columns; i++) {
+                    var char = chars[Math.floor(Math.random() * chars.length)];
+                    var x = i * fontSize;
+                    var y = drops[i] * fontSize;
+
+                    var brightness = Math.random();
+                    if (brightness > 0.95) {
+                        ctx.fillStyle = '#22d3a7';
+                    } else {
+                        ctx.fillStyle = 'rgba(34, 211, 167, ' + (0.3 + brightness * 0.4) + ')';
+                    }
+
+                    ctx.fillText(char, x, y);
+
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            draw();
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    if (animId) { cancelAnimationFrame(animId); animId = null; }
+                } else {
+                    if (!animId) draw();
+                }
+            });
+        })();
+    })();
+    </script>
+</body>
+</html>
