@@ -1,0 +1,108 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        edition: [lite, full]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install textual rich openai pexpect pyinstaller
+
+      - name: Build ${{ matrix.edition }} edition
+        run: python build.py --${{ matrix.edition }}
+
+      - name: Package macOS Lite
+        if: matrix.edition == 'lite'
+        run: |
+          cd dist
+          zip -r "../YaketyYak-Lite-macOS.zip" "Yakety Yak.app"
+
+      - name: Package macOS Full
+        if: matrix.edition == 'full'
+        run: |
+          cd dist/full-edition
+          zip -r "../../YaketyYak-Full-macOS.zip" "Yakety Yak.app" setup-ai-mac.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.edition }}
+          path: YaketyYak-*-macOS.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        edition: [lite, full]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install textual rich openai pexpect pyinstaller
+
+      - name: Build ${{ matrix.edition }} edition
+        run: python build.py --${{ matrix.edition }}
+
+      - name: Package Linux Lite
+        if: matrix.edition == 'lite'
+        run: |
+          cd dist
+          tar czf "../YaketyYak-Lite-Linux.tar.gz" linux-package/
+
+      - name: Package Linux Full
+        if: matrix.edition == 'full'
+        run: |
+          cd dist
+          tar czf "../YaketyYak-Full-Linux.tar.gz" full-edition/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.edition }}
+          path: YaketyYak-*-Linux.tar.gz
+
+  release:
+    needs: [build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: List files
+        run: ls -la YaketyYak-*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            YaketyYak-Lite-macOS.zip
+            YaketyYak-Full-macOS.zip
+            YaketyYak-Lite-Linux.tar.gz
+            YaketyYak-Full-Linux.tar.gz
