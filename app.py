@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import os
 import re
@@ -11,6 +12,9 @@ import json
 import urllib.request
 from datetime import datetime, timezone
 from collections import deque
+
+if getattr(sys, 'frozen', False):
+    sys.path.insert(0, sys._MEIPASS)
 
 from textual import work
 from textual.app import App, ComposeResult

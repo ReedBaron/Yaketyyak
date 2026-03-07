@@ -46,6 +46,8 @@ def build_executable():
 
     print(f"Building Yakety Yak for {platform.system()} ({platform.machine()})...")
 
+    local_modules = ["translator.py", "knowledge_base.py", "themes.py"]
+
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--onefile", "--name", EXECUTABLE_NAME,
@@ -53,6 +55,10 @@ def build_executable():
         "--paths", ".",
         "app.py",
     ]
+
+    for mod in local_modules:
+        if os.path.exists(mod):
+            cmd.extend(["--add-data", f"{mod}{os.pathsep}."])
 
     for imp in HIDDEN_IMPORTS:
         cmd.extend(["--hidden-import", imp])
