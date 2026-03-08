@@ -56,7 +56,7 @@ from themes import (
     THEME_NAMES,
 )
 
-APP_VERSION = "1.3.3"
+APP_VERSION = "1.3.4"
 
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]|\x1b\].*?\x07|\x1b\[.*?[@-~]|\r")
 
@@ -519,27 +519,110 @@ class YaketyYak(App):
         accent = "bright_magenta" if is_glass else "green"
         dim_accent = "magenta" if is_glass else "dark_green"
 
-        logo_lines = [
-            "",
-            f"  ╔{'═' * 47}╗",
-            f"  ║                                               ║",
-            f"  ║          (__)                                  ║",
-            f"  ║          (oo)                                  ║",
-            f"  ║    /------\\/                                   ║",
-            f"  ║   / |    ||                                    ║",
-            f"  ║  *  /\\---/\\                                   ║",
-            f"  ║     ~~   ~~                                    ║",
-            f"  ║                                               ║",
-            f"  ║    Y A K E T Y   Y A K                        ║",
-            f"  ║                                               ║",
-            f"  ╚{'═' * 47}╝",
-            "",
-        ]
+        horn = "bright_magenta" if is_glass else "magenta"
+        prompt_c = "bright_cyan" if is_glass else "green"
+        face = "yellow" if is_glass else "bright_yellow"
+        nose = "bright_magenta" if is_glass else "magenta"
+        bubble = "bright_green" if is_glass else "green"
+        border = accent
 
-        for line in logo_lines:
-            t = Text(line)
-            t.stylize(accent)
-            shell_out.write(t)
+        shell_out.write(Text(""))
+
+        def w(text_obj):
+            shell_out.write(text_obj)
+
+        line = Text(f"  ╔{'═' * 47}╗")
+        line.stylize(border)
+        w(line)
+
+        line = Text("  ║                                               ║")
+        line.stylize(border)
+        w(line)
+
+        line = Text("  ║            ╭ >_ ╮                             ║")
+        line.stylize(border)
+        line.stylize(prompt_c, 16, 20)
+        w(line)
+
+        line = Text("  ║            ╰────╯                             ║")
+        line.stylize(border)
+        line.stylize(prompt_c, 16, 22)
+        w(line)
+
+        line = Text("  ║      ╱╲              ╱╲                       ║")
+        line.stylize(border)
+        line.stylize(horn, 10, 12)
+        line.stylize(horn, 26, 28)
+        w(line)
+
+        line = Text("  ║     ╱  ╲    ▄▄▄▄    ╱  ╲                     ║")
+        line.stylize(border)
+        line.stylize(horn, 9, 13)
+        line.stylize(face, 17, 21)
+        line.stylize(horn, 25, 29)
+        w(line)
+
+        line = Text("  ║    ╱    ╲ ▄████████▄ ╱    ╲                   ║")
+        line.stylize(border)
+        line.stylize(horn, 8, 14)
+        line.stylize(face, 15, 25)
+        line.stylize(horn, 26, 32)
+        w(line)
+
+        line = Text("  ║   ╱      ██████████████      ╲               ║")
+        line.stylize(border)
+        line.stylize(horn, 7, 12)
+        line.stylize(face, 12, 26)
+        line.stylize(horn, 26, 33)
+        w(line)
+
+        line = Text("  ║          ██  ████  ██          ╭───╮         ║")
+        line.stylize(border)
+        line.stylize(face, 14, 16)
+        line.stylize("bold white", 16, 18)
+        line.stylize(face, 18, 22)
+        line.stylize("bold white", 22, 24)
+        line.stylize(face, 24, 26)
+        line.stylize(bubble, 36, 41)
+        w(line)
+
+        line = Text("  ║          ██▄ ▀██▀ ▄██          │...│         ║")
+        line.stylize(border)
+        line.stylize(face, 14, 17)
+        line.stylize(nose, 17, 21)
+        line.stylize(face, 21, 24)
+        line.stylize(bubble, 35, 40)
+        w(line)
+
+        line = Text("  ║           ▀███▄▄███▀           ╰───╯         ║")
+        line.stylize(border)
+        line.stylize(face, 15, 23)
+        line.stylize(bubble, 35, 40)
+        w(line)
+
+        line = Text("  ║             ▀▄▄▄▄▀                           ║")
+        line.stylize(border)
+        line.stylize(face, 17, 21)
+        w(line)
+
+        line = Text("  ║                                               ║")
+        line.stylize(border)
+        w(line)
+
+        line = Text("  ║       Y A K E T Y    Y A K                   ║")
+        line.stylize(border)
+        line.stylize(f"bold {accent}", 11, 39)
+        w(line)
+
+        line = Text("  ║                                               ║")
+        line.stylize(border)
+        w(line)
+
+        line = Text(f"  ╚{'═' * 47}╝")
+        line.stylize(border)
+        w(line)
+
+        shell_out.write(Text(""))
 
         tag = Text(f"  Terminal Translator v{APP_VERSION}")
         tag.stylize(f"bold {accent}")
