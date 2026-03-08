@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — Yakety Yak</title>
+    <meta name="description" content="Step-by-step instructions to install and run Yakety Yak on macOS or Linux.">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050810;
+            --bg-2: #0a0f1a;
+            --bg-3: #0f1524;
+            --surface: #131a2e;
+            --surface-2: #1a2340;
+            --border: #1e2a45;
+            --border-2: #2a3a5c;
+            --text: #e8ecf4;
+            --text-2: #8b99b3;
+            --text-3: #5a6a87;
+            --accent: #22d3a7;
+            --accent-dim: rgba(34, 211, 167, 0.12);
+            --accent-glow: rgba(34, 211, 167, 0.15);
+            --blue: #4f8ff7;
+            --red: #f05252;
+            --orange: #f59e0b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 8, 16, 0.92);
+            backdrop-filter: blur(12px);
+        }
+        .top-bar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top-bar a.logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .top-bar .logo-wordmark { height: 28px; }
+        .top-bar .back-link {
+            color: var(--text-2);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-bar .back-link:hover { color: var(--accent); }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero-section {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+        .download-check {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: pulseCheck 2s ease-in-out infinite;
+        }
+        @keyframes pulseCheck {
+            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            50% { box-shadow: 0 0 0 12px transparent; }
+        }
+        .download-check svg { color: var(--accent); }
+        .hero-section h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+        .hero-section p {
+            color: var(--text-2);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .hero-section .retry-link {
+            display: inline-block;
+            margin-top: 14px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .hero-section .retry-link:hover { text-decoration: underline; }
+
+        .os-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 40px 0 32px;
+        }
+        .os-tab {
+            padding: 10px 28px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-2);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .os-tab:hover {
+            border-color: var(--border-2);
+            color: var(--text);
+        }
+        .os-tab.active {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .os-tab svg { width: 18px; height: 18px; }
+
+        .os-panel { display: none; }
+        .os-panel.active { display: block; }
+
+        .steps {
+            counter-reset: step;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 0;
+            position: relative;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .step-number {
+            counter-increment: step;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .step-number::before { content: counter(step); }
+        .step-line {
+            width: 2px;
+            flex: 1;
+            background: linear-gradient(to bottom, var(--accent), var(--border));
+            min-height: 20px;
+        }
+        .step:last-child .step-line {
+            background: linear-gradient(to bottom, var(--accent), transparent);
+        }
+
+        .step-content {
+            padding: 6px 0 40px 20px;
+        }
+        .step-content h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 44px;
+            color: var(--text);
+        }
+        .step-content p {
+            color: var(--text-2);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .terminal-block {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .terminal-dot.red { background: #f05252; }
+        .terminal-dot.yellow { background: #f59e0b; }
+        .terminal-dot.green { background: #22d3a7; }
+        .terminal-bar span {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-3);
+            margin-left: 8px;
+        }
+        .terminal-body {
+            padding: 16px 18px;
+            font-family: var(--mono);
+            font-size: 0.88rem;
+            line-height: 1.8;
+            color: var(--text);
+            overflow-x: auto;
+        }
+        .terminal-body .prompt { color: var(--accent); }
+        .terminal-body .comment { color: var(--text-3); }
+        .terminal-body .output { color: var(--text-2); }
+
+        .visual-card {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .visual-card.warning {
+            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.04);
+        }
+        .visual-card.warning .card-header { color: var(--orange); }
+        .visual-card.success {
+            border-color: rgba(34, 211, 167, 0.3);
+            background: rgba(34, 211, 167, 0.04);
+        }
+        .visual-card.success .card-header { color: var(--accent); }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        .card-header svg { flex-shrink: 0; }
+        .visual-card p {
+            color: var(--text-2);
+            font-size: 0.93rem;
+            line-height: 1.7;
+        }
+        .visual-card ol, .visual-card ul {
+            color: var(--text-2);
+            font-size: 0.93rem;
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        .visual-card li { margin-bottom: 6px; }
+        .visual-card strong { color: var(--text); }
+        .visual-card code {
+            font-family: var(--mono);
+            background: var(--surface);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+        .visual-card a { color: var(--accent); }
+
+        .screenshot-frame {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .mock-dialog {
+            background: #2a2a2e;
+            border-radius: 12px;
+            padding: 28px 32px;
+            max-width: 420px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            text-align: left;
+        }
+        .mock-dialog .dialog-icon {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .mock-dialog .warn-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .mock-dialog h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e4e4e7;
+            line-height: 1.4;
+        }
+        .mock-dialog p.dialog-sub {
+            font-size: 0.82rem;
+            color: #a1a1aa;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        .mock-dialog .dialog-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .mock-dialog .dialog-btn {
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            cursor: default;
+        }
+        .mock-dialog .dialog-btn.secondary { background: #52525b; color: #e4e4e7; }
+        .mock-dialog .dialog-btn.primary { background: #3b82f6; color: white; }
+        .screenshot-frame .caption {
+            font-size: 0.8rem;
+            color: var(--text-3);
+            margin-top: 14px;
+        }
+
+        .pro-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(79, 143, 247, 0.06);
+            border: 1px solid rgba(79, 143, 247, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+        .pro-tip svg { flex-shrink: 0; margin-top: 2px; color: var(--blue); }
+        .pro-tip p { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; }
+        .pro-tip strong { color: var(--blue); }
+
+        .final-section {
+            text-align: center;
+            padding: 40px 0 80px;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        .final-section h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .final-section p {
+            color: var(--text-2);
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .final-section .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: var(--accent);
+            color: var(--bg);
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .final-section .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--accent-glow);
+        }
+
+        @media (max-width: 600px) {
+            .hero-section h1 { font-size: 1.6rem; }
+            .step { grid-template-columns: 48px 1fr; }
+            .step-number { width: 36px; height: 36px; font-size: 0.85rem; }
+            .step-content h3 { line-height: 36px; font-size: 1.05rem; }
+            .step-content { padding-left: 14px; }
+            .os-tab { padding: 8px 18px; font-size: 0.85rem; }
+            .mock-dialog { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <a href="/" class="logo">
+                <img src="/static/yak-wordmark.png" alt="YaketyYak" class="logo-wordmark">
+            </a>
+            <a href="/" class="back-link">&larr; Back to home</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="hero-section">
+            <div class="download-check">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h1>Your download has started!</h1>
+            <p>Follow these steps to get Yakety Yak running. It only takes a minute.</p>
+            <a href="#" class="retry-link" id="retry-download">Download didn't start? Click here to try again.</a>
+        </div>
+
+        <div class="os-tabs">
+            <button class="os-tab active" data-os="mac">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                macOS
+            </button>
+            <button class="os-tab" data-os="linux">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.581 19.049c-.55-.446-.336-1.431-.907-1.917.553-3.365-.997-6.331-2.845-8.232-1.551-1.595-1.958-3.321-1.881-4.243.039-.467-.237-.878-.664-.878H9.716c-.427 0-.703.411-.664.878.077.922-.33 2.648-1.881 4.243-1.848 1.901-3.398 4.867-2.845 8.232-.571.486-.357 1.471-.907 1.917-.264.215-.392.552-.392.898 0 .906.755 1.64 1.688 1.64h14.57c.933 0 1.688-.734 1.688-1.64 0-.346-.128-.683-.392-.898z"/></svg>
+                Linux
+            </button>
+        </div>
+
+        <!-- macOS Instructions -->
+        <div class="os-panel active" id="panel-mac">
+            <div class="steps">
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Locate and unzip</h3>
+                        <p>Open <strong>Finder</strong> and go to your <strong>Downloads</strong> folder. You'll see a <code>.zip</code> file. Double-click it to unzip — you'll get <strong>Yakety Yak.app</strong>.</p>
+                        <div class="terminal-block">
+                            <div class="terminal-bar">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <span>Finder — Downloads</span>
+                            </div>
+                            <div class="terminal-body">
+                                <span class="output">📦 YaketyYak-<span class="edition-label">Lite</span>-macOS.zip</span><br>
+                                <span class="comment">&nbsp;&nbsp;&nbsp;↓ double-click to unzip</span><br>
+                                <span class="output">🖥️ <strong>Yakety Yak.app</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Try to open Yakety Yak</h3>
+                        <p>Double-click <strong>Yakety Yak.app</strong> to run it. macOS will block it because we're not a verified Apple developer (yet). This is completely normal.</p>
+                        <div class="screenshot-frame">
+                            <div class="mock-dialog">
+                                <div class="dialog-icon">
+                                    <div class="warn-icon">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4>"Yakety Yak" can't be opened because Apple cannot verify the developer.</h4>
+                                        <p class="dialog-sub">macOS cannot verify that this app is free from malware.</p>
+                                    </div>
+                                </div>
+                                <div class="dialog-buttons">
+                                    <div class="dialog-btn secondary">Move to Trash</div>
+                                    <div class="dialog-btn secondary">Cancel</div>
+                                </div>
+                            </div>
+                            <p class="caption">This is expected. Click <strong>"Cancel"</strong> — do NOT move to trash.</p>
+                        </div>
+                        <div class="visual-card warning">
+                            <div class="card-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                Why does this happen?
+                            </div>
+                            <p>Apple requires a $99/year developer license to sign apps. Yakety Yak is free and open source, so we haven't paid for that. The app is safe — you can <a href="https://github.com/myiephero/Yaketyyak">review the entire source code</a> yourself.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Allow it to open (pick one method)</h3>
+                        <p>You have two easy options. Pick whichever feels more comfortable:</p>
+
+                        <div class="visual-card">
+                            <div class="card-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                Option A — Right-click method (easiest)
+                            </div>
+                            <ol>
+                                <li><strong>Right-click</strong> (or Control+click) on <strong>Yakety Yak.app</strong> in Finder</li>
+                                <li>Select <strong>"Open"</strong> from the context menu</li>
+                                <li>A new dialog appears — this time with an <strong>"Open"</strong> button</li>
+                                <li>Click <strong>"Open"</strong> — done!</li>
+                            </ol>
+                        </div>
+
+                        <div class="screenshot-frame">
+                            <div class="mock-dialog">
+                                <div class="dialog-icon">
+                                    <div class="warn-icon">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4>macOS cannot verify the developer of "Yakety Yak". Are you sure you want to open it?</h4>
+                                    </div>
+                                </div>
+                                <div class="dialog-buttons">
+                                    <div class="dialog-btn secondary">Cancel</div>
+                                    <div class="dialog-btn primary">Open</div>
+                                </div>
+                            </div>
+                            <p class="caption">After right-clicking and choosing "Open", you get this dialog. Click <strong>"Open"</strong>.</p>
+                        </div>
+
+                        <div class="visual-card">
+                            <div class="card-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Option B — System Settings method
+                            </div>
+                            <ol>
+                                <li>Click the <strong>Apple menu </strong> in the top-left corner</li>
+                                <li>Open <strong>System Settings</strong> (or "System Preferences" on older macOS)</li>
+                                <li>Go to <strong>Privacy & Security</strong></li>
+                                <li>Scroll down to the <strong>Security</strong> section</li>
+                                <li>You'll see: <em>"Yakety Yak" was blocked from use because it is not from an identified developer</em></li>
+                                <li>Click <strong>"Open Anyway"</strong></li>
+                                <li>Enter your Mac password when prompted</li>
+                            </ol>
+                        </div>
+
+                        <div class="pro-tip">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <p><strong>One-time only:</strong> You only need to do this once. After that, macOS remembers your choice and Yakety Yak opens normally every time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>You're in!</h3>
+                        <p>Yakety Yak opens in Terminal with a split-pane view. The left panel is your real shell — type any command. The right panel explains it instantly.</p>
+                        <div class="visual-card success">
+                            <div class="card-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Try these first commands
+                            </div>
+                            <ul>
+                                <li><code>ls -la</code> — list files with details</li>
+                                <li><code>pwd</code> — see your current directory</li>
+                                <li><code>git status</code> — check a repo's status</li>
+                                <li><code>mode noob</code> — switch to the simplest explanations</li>
+                            </ul>
+                        </div>
+                        <div class="pro-tip">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <p><strong>Want to run from Terminal instead?</strong> Open Terminal.app and type:<br><code>open ~/Downloads/Yakety\ Yak.app</code></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Linux Instructions -->
+        <div class="os-panel" id="panel-linux">
+            <div class="steps">
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Open your terminal</h3>
+                        <p>Press <code>Ctrl+Alt+T</code> or search for "Terminal" in your applications menu.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Extract the archive</h3>
+                        <p>Navigate to your Downloads folder and extract the <code>.tar.gz</code> file:</p>
+                        <div class="terminal-block">
+                            <div class="terminal-bar">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <span>Terminal</span>
+                            </div>
+                            <div class="terminal-body">
+                                <span class="prompt">~$</span> cd ~/Downloads<br>
+                                <span class="prompt">~$</span> tar -xzf YaketyYak-<span class="edition-label">Lite</span>-Linux.tar.gz
+                            </div>
+                        </div>
+                        <p>This creates a <code>linux-package/</code> folder with everything you need.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Run the installer</h3>
+                        <p>The package includes an install script that sets everything up for you:</p>
+                        <div class="terminal-block">
+                            <div class="terminal-bar">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <span>Terminal</span>
+                            </div>
+                            <div class="terminal-body">
+                                <span class="prompt">~$</span> cd linux-package<br>
+                                <span class="prompt">~$</span> chmod +x install.sh<br>
+                                <span class="prompt">~$</span> ./install.sh<br>
+                                <span class="output">Installing Yakety Yak...</span><br>
+                                <span class="output" style="color:var(--accent)">Done! Run 'yakety-yak' to start.</span>
+                            </div>
+                        </div>
+                        <div class="pro-tip">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <p><strong>Don't want to install?</strong> You can run it directly without installing:<br><code>chmod +x bin/yakety-yak && ./bin/yakety-yak</code></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-indicator">
+                        <div class="step-number"></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-content">
+                        <h3>Launch Yakety Yak</h3>
+                        <p>After installation, just type:</p>
+                        <div class="terminal-block">
+                            <div class="terminal-bar">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                                <span>Terminal</span>
+                            </div>
+                            <div class="terminal-body">
+                                <span class="prompt">~$</span> yakety-yak
+                            </div>
+                        </div>
+                        <div class="visual-card success">
+                            <div class="card-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Try these first commands
+                            </div>
+                            <ul>
+                                <li><code>ls -la</code> — list files with details</li>
+                                <li><code>pwd</code> — see your current directory</li>
+                                <li><code>git status</code> — check a repo's status</li>
+                                <li><code>mode noob</code> — switch to the simplest explanations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="final-section">
+            <h2>Need help?</h2>
+            <p>Join the community or open an issue — we respond fast.</p>
+            <a href="https://github.com/myiephero/Yaketyyak/issues" target="_blank" rel="noopener" class="btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Open an Issue on GitHub
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.os-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.os-tab').forEach(function(t) { t.classList.remove('active'); });
+                document.querySelectorAll('.os-panel').forEach(function(p) { p.classList.remove('active'); });
+                this.classList.add('active');
+                document.getElementById('panel-' + this.getAttribute('data-os')).classList.add('active');
+            });
+        });
+
+        (function init() {
+            var params = new URLSearchParams(window.location.search);
+            var os = params.get('os');
+            var edition = params.get('edition') || 'lite';
+
+            if (os === 'Linux') {
+                var linuxTab = document.querySelector('.os-tab[data-os="linux"]');
+                if (linuxTab) linuxTab.click();
+            } else if (!os) {
+                var ua = navigator.userAgent || '';
+                if (/Linux/i.test(ua) && !/Mac/i.test(ua)) {
+                    var linuxTab = document.querySelector('.os-tab[data-os="linux"]');
+                    if (linuxTab) linuxTab.click();
+                }
+            }
+
+            var editionName = edition === 'full' ? 'Full' : 'Lite';
+            document.querySelectorAll('.edition-label').forEach(function(el) {
+                el.textContent = editionName;
+            });
+
+            var REPO = 'myiephero/Yaketyyak';
+            var RELEASE_BASE = 'https://github.com/' + REPO + '/releases/latest/download/';
+            var detectedOS = os || ((navigator.userAgent || '').match(/Mac/i) ? 'macOS' : 'Linux');
+
+            var retryLink = document.getElementById('retry-download');
+            if (retryLink) {
+                var ext = detectedOS === 'macOS' ? '-macOS.zip' : '-Linux.tar.gz';
+                var retryURL = RELEASE_BASE + 'YaketyYak-' + editionName + ext;
+                retryLink.href = retryURL;
+            }
+        })();
+    </script>
+
+</body>
+</html>

@@ -6,13 +6,27 @@
     <title>Yakety Yak — Understand Every Command</title>
     <meta name="description" content="A split-pane terminal that explains commands and output in plain language as you type. Free, open source, works offline.">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script>
+        (function(w,d,i) { w._captiwateSettings={site:i};
+            if(w.Captiwate&&w.Captiwate._loaded)return;
+            w.Captiwate=new Proxy({_q:[]},{get:function(t,p){
+                if(p==='_q'||p==='_loaded')return t[p];
+                return function(){t._q.push([p,[].slice.call(arguments)]);};
+            }});
+            var h=d.getElementsByTagName('head')[0];
+            var s=d.createElement('script');
+            s.defer=1; s.type='module';
+            s.src='https://widget.captiwate.com/widget.js';
+            h.appendChild(s);
+        }) (window, document, '66169c16-6155-41e7-b6f1-f1f6b24e9854');
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=11">
+    <link rel="stylesheet" href="/static/style.css?v=24">
 </head>
 <body>
 
@@ -27,10 +41,18 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
-                <a href="#download">Download</a>
+                <a href="#download">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <div class="version-badge-nav" id="version-badge-nav">
+                    <span class="version-tag-nav" id="version-tag-nav">v1.3.0</span>
+                    <span class="version-label-nav">Latest</span>
+                </div>
                 <a href="https://github.com/myiephero/Yaketyyak" target="_blank" rel="noopener" class="nav-github">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                    <span class="nav-star-count" id="nav-stars">Star</span>
+                    <span class="nav-star-count" id="nav-stars">
+                        <svg class="nav-star-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <span id="nav-stars-text">Star</span>
+                    </span>
                 </a>
             </div>
             <a href="#download" class="btn btn-sm btn-primary nav-cta">Download Free</a>
@@ -39,6 +61,11 @@
 
     <section class="hero">
         <div class="hero-glow"></div>
+        <div class="starburst">
+            <div class="starburst-inner">
+                <span class="starburst-text">As seen on<br><strong>Building AI<br>2026 Hackathon</strong></span>
+            </div>
+        </div>
         <div class="container">
             <div class="hero-content">
                 <div class="hero-badge">
@@ -507,112 +534,228 @@
         <div class="container">
             <div class="section-label">Download</div>
             <h2 class="section-title">Pick your power level.</h2>
-            <p class="section-sub">Both editions are free and open source. Both work offline. The difference is how smart the explanations get.</p>
+            <p class="section-sub">Two free editions that work offline, plus a Pro tier with cloud AI — no API key needed.</p>
 
-            <div class="pricing-grid">
-                <div class="price-card card-reveal">
-                    <div class="price-icon-row">
-                        <div class="price-icon-circle">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        </div>
+            <div class="dl-terminal-window card-reveal">
+                <div class="dl-terminal-bar">
+                    <div class="dl-terminal-dots">
+                        <span class="dl-dot dl-dot-red"></span>
+                        <span class="dl-dot dl-dot-yellow"></span>
+                        <span class="dl-dot dl-dot-green"></span>
                     </div>
-                    <div class="price-header">
-                        <span class="price-name">Lite</span>
-                        <span class="price-tag">Free</span>
+                    <div class="dl-terminal-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        yakety-yak — download
                     </div>
-                    <p class="price-tagline">The knowledge base powerhouse.</p>
-                    <p class="price-desc">507 commands and 52 error patterns explained in under 1ms. No internet, no AI, no waiting. Perfect for learning the basics fast.</p>
-
-                    <div class="price-stats">
-                        <div class="price-stat">
-                            <span class="stat-value">507</span>
-                            <span class="stat-label">commands</span>
-                        </div>
-                        <div class="price-stat">
-                            <span class="stat-value">52</span>
-                            <span class="stat-label">error patterns</span>
-                        </div>
-                        <div class="price-stat">
-                            <span class="stat-value">&lt;1ms</span>
-                            <span class="stat-label">response</span>
-                        </div>
-                    </div>
-
-                    <ul class="price-features">
-                        <li>4 skill modes (Noob to Advanced)</li>
-                        <li>25 guided starter commands</li>
-                        <li>Git Translator with risk/reward scoring</li>
-                        <li>Terminal + Glass themes</li>
-                        <li>Works 100% offline — zero config</li>
-                        <li>Add your own API key for cloud AI later</li>
-                    </ul>
-                    <a href="#" class="btn btn-outline btn-full download-btn" data-edition="lite">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download Lite
-                        <span class="btn-sub">~24 MB</span>
-                    </a>
-                    <p class="price-footer">Single file. No installer. No runtime.</p>
+                    <div class="dl-version-pill" id="dl-version-tag">v1.2.1</div>
                 </div>
 
-                <div class="price-card price-card-pop card-reveal">
-                    <div class="pop-label">Recommended</div>
-                    <div class="price-icon-row">
-                        <div class="price-icon-circle price-icon-pop">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <div class="dl-cards-container">
+                    <div class="dl-card card-reveal">
+                        <div class="dl-card-glow dl-card-glow-lite"></div>
+                        <div class="dl-card-header">
+                            <div class="dl-icon-wrap">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            </div>
+                            <div class="dl-card-titles">
+                                <span class="dl-card-name">Lite</span>
+                                <span class="dl-card-tagline">The knowledge base powerhouse.</span>
+                            </div>
+                            <span class="dl-price-badge">Free</span>
                         </div>
-                    </div>
-                    <div class="price-header">
-                        <span class="price-name">Full + AI</span>
-                        <span class="price-tag price-tag-glow">Free</span>
-                    </div>
-                    <p class="price-tagline">Understands <em>everything.</em></p>
-                    <p class="price-desc">Everything in Lite, plus a local AI that runs on your machine. Explains any command, any error, any output — even obscure ones the knowledge base hasn't seen.</p>
 
-                    <div class="price-stats">
-                        <div class="price-stat">
-                            <span class="stat-value stat-inf">&infin;</span>
-                            <span class="stat-label">commands</span>
+                        <p class="dl-card-desc">507 commands and 52 error patterns explained in under 1ms. No internet, no AI, no waiting.</p>
+
+                        <div class="dl-kpi-row">
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">507</span>
+                                <span class="dl-kpi-label">commands</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">52</span>
+                                <span class="dl-kpi-label">errors</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">&lt;1ms</span>
+                                <span class="dl-kpi-label">response</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">~24</span>
+                                <span class="dl-kpi-label">MB</span>
+                            </div>
                         </div>
-                        <div class="price-stat">
-                            <span class="stat-value stat-inf">&infin;</span>
-                            <span class="stat-label">error patterns</span>
+
+                        <div class="dl-features-grid">
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> 4 skill modes</div>
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> 25 starter commands</div>
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> Git Translator</div>
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> 2 polished themes</div>
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> 100% offline</div>
+                            <div class="dl-feat"><span class="dl-feat-icon">&#9632;</span> BYOK for cloud AI</div>
                         </div>
-                        <div class="price-stat">
-                            <span class="stat-value">8</span>
-                            <span class="stat-label">languages</span>
-                        </div>
+
+                        <a href="#" class="dl-download-btn dl-btn-outline download-btn" data-edition="lite">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Download Lite</span>
+                            <span class="btn-sub">~24 MB</span>
+                        </a>
+                        <p class="dl-card-footer">Single file. No installer. No runtime.</p>
                     </div>
 
-                    <ul class="price-features">
-                        <li>Everything in Lite</li>
-                        <li>Ollama auto-installs for you</li>
-                        <li>Qwen2.5-Coder model (code-focused)</li>
-                        <li>Explains ANY command, output, or error</li>
-                        <li>Translate explanations to 8 languages</li>
-                        <li>100% local — your data never leaves</li>
-                    </ul>
-                    <a href="#" class="btn btn-primary btn-full download-btn" data-edition="full">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download Full + AI
-                        <span class="btn-sub">~24 MB app + ~1 GB model</span>
-                    </a>
-                    <p class="price-footer">Ollama installs automatically on first run.</p>
+                    <div class="dl-card dl-card-featured card-reveal">
+                        <div class="dl-card-glow dl-card-glow-full"></div>
+                        <div class="dl-pop-badge">Recommended</div>
+                        <div class="dl-card-header">
+                            <div class="dl-icon-wrap dl-icon-featured">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            </div>
+                            <div class="dl-card-titles">
+                                <span class="dl-card-name">Full + AI</span>
+                                <span class="dl-card-tagline">Understands <em>everything.</em></span>
+                            </div>
+                            <span class="dl-price-badge dl-price-glow">Free</span>
+                        </div>
+
+                        <p class="dl-card-desc">Everything in Lite, plus a local AI that runs on your machine. Explains any command, any error, any output.</p>
+
+                        <div class="dl-kpi-row">
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val dl-kpi-inf">&infin;</span>
+                                <span class="dl-kpi-label">commands</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val dl-kpi-inf">&infin;</span>
+                                <span class="dl-kpi-label">errors</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">8</span>
+                                <span class="dl-kpi-label">languages</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">~1GB</span>
+                                <span class="dl-kpi-label">AI model</span>
+                            </div>
+                        </div>
+
+                        <div class="dl-features-grid">
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> Everything in Lite</div>
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> Ollama auto-installs</div>
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> Qwen2.5-Coder model</div>
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> ANY command explained</div>
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> 8 language translations</div>
+                            <div class="dl-feat"><span class="dl-feat-check">&#10003;</span> 100% local &amp; private</div>
+                        </div>
+
+                        <a href="#" class="dl-download-btn dl-btn-primary download-btn" data-edition="full">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Download Full + AI</span>
+                            <span class="btn-sub">~24 MB + ~1 GB model</span>
+                        </a>
+                        <p class="dl-card-footer">Ollama installs automatically on first run.</p>
+                    </div>
+
+                    <div class="dl-card dl-card-pro card-reveal">
+                        <div class="dl-card-glow dl-card-glow-pro"></div>
+                        <div class="dl-pop-badge dl-pop-badge-pro">Pro</div>
+                        <div class="dl-card-header">
+                            <div class="dl-icon-wrap dl-icon-pro">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+                            </div>
+                            <div class="dl-card-titles">
+                                <span class="dl-card-name">Pro</span>
+                                <span class="dl-card-tagline">Cloud AI, zero setup.</span>
+                            </div>
+                            <span class="dl-price-badge dl-price-pro">$7/mo</span>
+                        </div>
+
+                        <p class="dl-card-desc">GPT-5 powered translations via our cloud proxy. No API key, no Ollama, no setup. Just upgrade and go.</p>
+
+                        <div class="dl-kpi-row">
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val dl-kpi-inf">&infin;</span>
+                                <span class="dl-kpi-label">commands</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">500</span>
+                                <span class="dl-kpi-label">/month</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">8</span>
+                                <span class="dl-kpi-label">languages</span>
+                            </div>
+                            <div class="dl-kpi">
+                                <span class="dl-kpi-val">GPT-5</span>
+                                <span class="dl-kpi-label">model</span>
+                            </div>
+                        </div>
+
+                        <div class="dl-features-grid">
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> Cloud AI (no setup)</div>
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> GPT-5 translations</div>
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> 8 language output</div>
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> 500 translations/mo</div>
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> Priority support</div>
+                            <div class="dl-feat"><span class="dl-feat-star">&#9733;</span> License key activation</div>
+                        </div>
+
+                        <div class="dl-pro-pricing">
+                            <button class="dl-download-btn dl-btn-pro" id="btn-pro-monthly" onclick="startCheckout('monthly')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
+                                <span>$7 / month</span>
+                            </button>
+                            <button class="dl-download-btn dl-btn-pro-alt" id="btn-pro-yearly" onclick="startCheckout('yearly')">
+                                <span>$49 / year</span>
+                                <span class="btn-sub">Save 42%</span>
+                            </button>
+                        </div>
+                        <p class="dl-card-footer">Cancel anytime. Includes the free app + cloud AI proxy.</p>
+                    </div>
+                </div>
+
+                <div class="dl-terminal-status">
+                    <span class="dl-status-dot"></span>
+                    <span class="dl-status-text" id="dl-version-date">Latest stable release</span>
+                    <span class="dl-status-sep">|</span>
+                    <span class="dl-status-os" id="dl-os-label">macOS &amp; Linux</span>
+                    <span class="dl-status-sep">|</span>
+                    <span class="dl-status-text">Open Source (MIT)</span>
                 </div>
             </div>
 
-            <div class="install-steps card-reveal">
-                <div class="install-steps-header">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-                    <span>First launch on macOS</span>
+            <div class="dl-install-panel card-reveal">
+                <div class="dl-install-header">
+                    <div class="dl-install-dots">
+                        <span class="dl-dot dl-dot-red"></span>
+                        <span class="dl-dot dl-dot-yellow"></span>
+                        <span class="dl-dot dl-dot-green"></span>
+                    </div>
+                    <span class="dl-install-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        First launch on macOS
+                    </span>
                 </div>
-                <p class="install-steps-desc">macOS blocks apps from unidentified developers by default. Here's how to open Yakety Yak:</p>
-                <ol class="install-steps-list">
-                    <li><strong>Unzip</strong> the download — you'll see <code>Yakety Yak.app</code></li>
-                    <li><strong>Drag</strong> it into your <code>/Applications</code> folder</li>
-                    <li><strong>Right-click</strong> (or Control-click) the app and choose <strong>Open</strong></li>
-                    <li>Click <strong>Open</strong> in the dialog that appears</li>
-                </ol>
-                <p class="install-steps-note">You only need to do this once. After that, it opens normally from your dock.</p>
+                <div class="dl-install-body">
+                    <p class="dl-install-desc">macOS blocks apps from unidentified developers. Here's the one-time fix:</p>
+                    <div class="dl-install-steps">
+                        <div class="dl-step">
+                            <span class="dl-step-num">1</span>
+                            <span><strong>Unzip</strong> the download — you'll see <code>Yakety Yak.app</code></span>
+                        </div>
+                        <div class="dl-step">
+                            <span class="dl-step-num">2</span>
+                            <span><strong>Drag</strong> into <code>/Applications</code></span>
+                        </div>
+                        <div class="dl-step">
+                            <span class="dl-step-num">3</span>
+                            <span><strong>Right-click</strong> the app &rarr; choose <strong>Open</strong></span>
+                        </div>
+                        <div class="dl-step">
+                            <span class="dl-step-num">4</span>
+                            <span>Click <strong>Open</strong> in the dialog</span>
+                        </div>
+                    </div>
+                    <p class="dl-install-note">After the first time, it opens normally from your dock.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -670,6 +813,68 @@
         </div>
     </section>
 
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Do I need an API key to use Yakety Yak?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No. The app works completely offline with a built-in knowledge base of 500+ commands. If you want cloud AI explanations, you can get Pro for $7/month, but it's optional.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>What operating systems does it support?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yakety Yak runs on macOS (Intel and Apple Silicon) and Linux. Just download, extract, and run. No installation required.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Can I use it with bash, zsh, fish, etc?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. Yakety Yak works with any POSIX shell including bash, zsh, fish, and others. Just run the app and it integrates with your current shell.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Is the source code really open?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. The entire codebase is open source on GitHub under a permissive license. You can fork it, modify it, and use it however you want.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>What's the difference between Free and Pro?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Free includes the app + offline knowledge base. Pro adds cloud AI explanations (for commands not in the KB) and removes the 500 translations/month limit. Same app, more power.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Can I run Ollama locally instead of Pro?</span>
+                        <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. Yakety Yak auto-detects Ollama if you have it installed. The app will use local AI for free without any subscription.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="final-cta">
         <div class="container">
             <div class="cta-glow"></div>
@@ -712,6 +917,24 @@
         var RELEASE_BASE = 'https://github.com/' + REPO + '/releases/latest/download/';
         var RELEASES_PAGE = 'https://github.com/' + REPO + '/releases/latest';
 
+        fetch('https://api.github.com/repos/' + REPO + '/releases/latest')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data && data.tag_name) {
+                    var v = data.tag_name;
+                    var vEl = document.getElementById('version-tag');
+                    var dlEl = document.getElementById('dl-version-tag');
+                    if (vEl) vEl.textContent = v;
+                    if (dlEl) dlEl.textContent = v;
+                    var dateEl = document.getElementById('dl-version-date');
+                    if (dateEl && data.published_at) {
+                        var d = new Date(data.published_at);
+                        dateEl.textContent = 'Released ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
+                }
+            })
+            .catch(function() {});
+
         function getOS() {
             var ua = navigator.userAgent || navigator.platform || '';
             if (/Mac/i.test(ua)) return 'macOS';
@@ -744,7 +967,16 @@
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 var edition = this.getAttribute('data-edition');
-                window.location.href = getDownloadURL(edition);
+                var url = getDownloadURL(edition);
+                var link = document.createElement('a');
+                link.href = url;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(function() {
+                    window.location.href = '/getting-started?os=' + encodeURIComponent(getOS()) + '&edition=' + encodeURIComponent(edition);
+                }, 1500);
             });
         });
 
@@ -902,9 +1134,9 @@
                 .then(function(data) {
                     var count = data.stargazers_count || 0;
                     var heroEl = document.getElementById('hero-stars');
-                    var navEl = document.getElementById('nav-stars');
+                    var navTextEl = document.getElementById('nav-stars-text');
                     if (heroEl) heroEl.textContent = count;
-                    if (navEl) navEl.textContent = count > 0 ? count : 'Star';
+                    if (navTextEl) navTextEl.textContent = count > 0 ? count : 'Star';
                 })
                 .catch(function() {});
         })();
@@ -984,6 +1216,37 @@
                 }
             });
         })();
+
+        window.startCheckout = function(plan) {
+            var emailInput = prompt('Enter your email to subscribe to Yakety Yak Pro:');
+            if (!emailInput || !emailInput.trim()) return;
+
+            var btn = document.getElementById(plan === 'monthly' ? 'btn-pro-monthly' : 'btn-pro-yearly');
+            var origText = btn.innerHTML;
+            btn.innerHTML = '<span>Processing...</span>';
+            btn.disabled = true;
+
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan: plan, email: emailInput.trim() }),
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert(data.error || 'Could not start checkout. Please try again.');
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(function() {
+                alert('Network error. Please try again.');
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            });
+        };
     })();
     </script>
 </body>

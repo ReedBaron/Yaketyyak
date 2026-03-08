@@ -28,9 +28,10 @@ A split-pane TUI tool that translates terminal/CLI output into plain-language ex
 - `seed_products.py` — Script to create Stripe products/prices (run once)
 - `tui_preview.py` — Interactive UI preview with animated demo content
 - `templates/index.html` — Landing page with animated terminal demo, 3-tier pricing (Lite/Full/Pro), Stripe checkout
+- `templates/getting-started.html` — Post-download instructions page with OS-specific steps (macOS Gatekeeper bypass, Linux install.sh), auto-detects OS and edition from query params
 - `templates/success.html` — Post-checkout page with download buttons and email-based login instructions
 - `templates/account.html` — Account management page with email lookup, usage stats, download links, and Stripe billing portal
-- `static/style.css` — Landing page styles with Pro tier gold theme; cache buster at `?v=15`
+- `static/style.css` — Landing page styles with Pro tier gold theme; cache buster at `?v=24`
 
 ## GitHub Repo
 
@@ -49,6 +50,7 @@ api_usage: id, license_key, tokens_used, endpoint, created_at
 - `GET /` — Landing page
 - `GET /success?session_id=X` — Post-checkout success page
 - `GET /account` — Account management page
+- `GET /getting-started?os=X&edition=Y` — Post-download setup instructions (OS: macOS/Linux, edition: lite/full)
 - `GET /api/config` — Stripe publishable key and price IDs
 - `POST /api/checkout` — Create Stripe Checkout session (body: {plan, email})
 - `GET /api/checkout/success?session_id=X` — Retrieve account info after payment
