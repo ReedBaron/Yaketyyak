@@ -38,6 +38,31 @@ def save_theme_preference(theme):
         pass
 
 
+def load_license_key():
+    try:
+        with open(PREFS_FILE, "r") as f:
+            prefs = json.load(f)
+            return prefs.get("license_key", "")
+    except (FileNotFoundError, json.JSONDecodeError, OSError, PermissionError):
+        return ""
+
+
+def save_license_key(key):
+    try:
+        os.makedirs(PREFS_DIR, exist_ok=True)
+        prefs = {}
+        try:
+            with open(PREFS_FILE, "r") as f:
+                prefs = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+        prefs["license_key"] = key
+        with open(PREFS_FILE, "w") as f:
+            json.dump(prefs, f, indent=2)
+    except (OSError, PermissionError):
+        pass
+
+
 APP_CSS = """
 Screen {
     layout: vertical;
@@ -52,9 +77,10 @@ Screen {
 }
 
 #view-toggle-bar Button {
-    min-width: 18;
+    min-width: 20;
     height: 3;
-    margin: 0 0;
+    margin: 0 1 0 0;
+    text-style: bold;
 }
 
 #btn-terminal-view {
@@ -68,11 +94,13 @@ Screen {
 #main-container {
     layout: horizontal;
     height: 1fr;
+    padding: 0 1;
 }
 
 #shell-panel {
     width: 1fr;
     height: 100%;
+    margin: 0 1 0 0;
 }
 
 #shell-panel-inner {
@@ -85,16 +113,19 @@ Screen {
     text-align: center;
     text-style: bold;
     padding: 0 1;
+    content-align: center middle;
 }
 
 #shell-output {
     height: 1fr;
     scrollbar-size: 1 1;
+    padding: 0 1;
 }
 
 #shell-input {
     dock: bottom;
     height: 3;
+    margin: 0 1;
 }
 
 #translation-panel {
@@ -112,17 +143,19 @@ Screen {
     text-align: center;
     text-style: bold;
     padding: 0 1;
+    content-align: center middle;
 }
 
 #translation-output {
     height: 1fr;
     scrollbar-size: 1 1;
-    padding: 0 1;
+    padding: 1 2;
 }
 
 #git-container {
     height: 1fr;
     display: none;
+    padding: 0 1;
 }
 
 #git-container.active {
@@ -154,7 +187,7 @@ Screen {
     dock: top;
     height: 3;
     layout: horizontal;
-    padding: 0 1;
+    padding: 1 1 0 1;
 }
 
 #git-url-input {
@@ -162,22 +195,23 @@ Screen {
 }
 
 #btn-analyze {
-    min-width: 14;
+    min-width: 16;
     height: 3;
     margin: 0 0 0 1;
+    text-style: bold;
 }
 
 #git-results {
     height: 1fr;
     scrollbar-size: 1 1;
-    padding: 0 1;
+    padding: 1 2;
 }
 
 #settings-bar {
     dock: bottom;
     height: 3;
     layout: horizontal;
-    padding: 0 1;
+    padding: 0 2;
 }
 
 #settings-bar Label {
@@ -195,6 +229,7 @@ Screen {
 
 #ai-label {
     padding: 1 1 0 2;
+    text-style: bold;
 }
 
 #status-label {
@@ -211,146 +246,160 @@ Screen {
 /* ── Terminal Theme (default) ── */
 
 Screen.theme-terminal {
-    background: #060a13;
+    background: #050810;
 }
 
 Screen.theme-terminal #view-toggle-bar {
-    background: #0a0e17;
-    border-bottom: solid #10b98130;
+    background: #080c16;
+    border-bottom: solid #10b981;
 }
 
 Screen.theme-terminal #btn-terminal-view {
-    background: #111827;
-    color: #94a3b8;
+    background: #0d1420;
+    color: #4b5e75;
 }
 
 Screen.theme-terminal #btn-git-view {
-    background: #111827;
-    color: #94a3b8;
+    background: #0d1420;
+    color: #4b5e75;
 }
 
 Screen.theme-terminal #btn-terminal-view.active-view {
     background: #10b981;
-    color: #0a0e17;
+    color: #050810;
     text-style: bold;
 }
 
 Screen.theme-terminal #btn-git-view.active-view {
     background: #10b981;
-    color: #0a0e17;
+    color: #050810;
     text-style: bold;
 }
 
 Screen.theme-terminal #shell-panel {
-    border: solid #10b981;
+    border: double #10b981;
+    background: #070b14;
 }
 
 Screen.theme-terminal #shell-title {
     background: #10b981;
-    color: #0a0e17;
+    color: #050810;
+    text-style: bold;
 }
 
 Screen.theme-terminal #shell-output {
-    background: #0a0e17;
+    background: #070b14;
     color: #e2e8f0;
 }
 
 Screen.theme-terminal #shell-input {
-    background: #111827;
-    color: #e2e8f0;
+    background: #0d1420;
+    color: #10b981;
     border: tall #10b981;
 }
 
 Screen.theme-terminal #translation-panel {
-    border: solid #10b981;
+    border: double #059669;
+    background: #070b14;
 }
 
 Screen.theme-terminal #translation-title {
-    background: #10b981;
-    color: #0a0e17;
+    background: #059669;
+    color: #050810;
+    text-style: bold;
 }
 
 Screen.theme-terminal #translation-output {
-    background: #0a0e17;
-    color: #e2e8f0;
+    background: #070b14;
+    color: #d1d5db;
 }
 
 Screen.theme-terminal #git-panel {
-    border: solid #10b981;
+    border: double #10b981;
+    background: #070b14;
 }
 
 Screen.theme-terminal #git-title {
     background: #10b981;
-    color: #0a0e17;
+    color: #050810;
+    text-style: bold;
 }
 
 Screen.theme-terminal #git-url-input {
-    background: #111827;
-    color: #e2e8f0;
+    background: #0d1420;
+    color: #10b981;
     border: tall #10b981;
 }
 
 Screen.theme-terminal #btn-analyze {
     background: #10b981;
-    color: #0a0e17;
+    color: #050810;
     text-style: bold;
 }
 
 Screen.theme-terminal #git-results {
-    background: #0a0e17;
-    color: #e2e8f0;
+    background: #070b14;
+    color: #d1d5db;
 }
 
 Screen.theme-terminal #settings-bar {
-    background: #111827;
+    background: #080c16;
+    border-top: solid #10b981;
 }
 
 Screen.theme-terminal #settings-bar Label {
-    color: #94a3b8;
+    color: #6b8299;
+}
+
+Screen.theme-terminal #settings-bar Select > SelectCurrent {
+    background: #0d1420;
+    color: #10b981;
 }
 
 Screen.theme-terminal #ai-label {
     color: #10b981;
+    text-style: bold;
 }
 
 Screen.theme-terminal #theme-label {
-    color: #10b981;
+    color: #059669;
 }
 
 Screen.theme-terminal #status-label {
-    color: #64748b;
+    color: #4b5e75;
 }
 
 Screen.theme-terminal Header {
-    background: #0a0e17;
+    background: #050810;
     color: #10b981;
+    text-style: bold;
 }
 
 Screen.theme-terminal Footer {
-    background: #111827;
-    color: #64748b;
+    background: #080c16;
+    color: #4b5e75;
 }
 
 
 /* ── Glass Theme ── */
 
 Screen.theme-glass {
-    background: #0a0520;
+    background: #08041a;
 }
 
 Screen.theme-glass #view-toggle-bar {
-    background: #0f0a2e;
-    border-bottom: solid #6366f130;
+    background: #0c0824;
+    border-bottom: solid #6366f1;
 }
 
 Screen.theme-glass #btn-terminal-view {
-    background: #1a1545;
-    color: #a5b4fc;
+    background: #141040;
+    color: #6366f1;
 }
 
 Screen.theme-glass #btn-git-view {
-    background: #1a1545;
-    color: #a5b4fc;
+    background: #141040;
+    color: #6366f1;
 }
 
 Screen.theme-glass #btn-terminal-view.active-view {
@@ -366,51 +415,57 @@ Screen.theme-glass #btn-git-view.active-view {
 }
 
 Screen.theme-glass #shell-panel {
-    border: round #6366f1;
+    border: round #818cf8;
+    background: #0c0826;
 }
 
 Screen.theme-glass #shell-title {
-    background: #4f46e5;
+    background: #6366f1;
     color: #e0e7ff;
+    text-style: bold;
 }
 
 Screen.theme-glass #shell-output {
-    background: #0f0a2e;
+    background: #0c0826;
     color: #c7d2fe;
 }
 
 Screen.theme-glass #shell-input {
-    background: #1a1545;
-    color: #e0e7ff;
+    background: #141040;
+    color: #a5b4fc;
     border: round #818cf8;
 }
 
 Screen.theme-glass #translation-panel {
-    border: round #818cf8;
+    border: round #a78bfa;
+    background: #0c0826;
 }
 
 Screen.theme-glass #translation-title {
-    background: #6366f1;
+    background: #7c3aed;
     color: #e0e7ff;
+    text-style: bold;
 }
 
 Screen.theme-glass #translation-output {
-    background: #0f0a2e;
-    color: #c7d2fe;
+    background: #0c0826;
+    color: #ddd6fe;
 }
 
 Screen.theme-glass #git-panel {
     border: round #818cf8;
+    background: #0c0826;
 }
 
 Screen.theme-glass #git-title {
     background: #6366f1;
     color: #e0e7ff;
+    text-style: bold;
 }
 
 Screen.theme-glass #git-url-input {
-    background: #1a1545;
-    color: #e0e7ff;
+    background: #141040;
+    color: #a5b4fc;
     border: round #818cf8;
 }
 
@@ -421,20 +476,27 @@ Screen.theme-glass #btn-analyze {
 }
 
 Screen.theme-glass #git-results {
-    background: #0f0a2e;
-    color: #c7d2fe;
+    background: #0c0826;
+    color: #ddd6fe;
 }
 
 Screen.theme-glass #settings-bar {
-    background: #1a1545;
+    background: #0c0824;
+    border-top: solid #6366f1;
 }
 
 Screen.theme-glass #settings-bar Label {
+    color: #818cf8;
+}
+
+Screen.theme-glass #settings-bar Select > SelectCurrent {
+    background: #141040;
     color: #a5b4fc;
 }
 
 Screen.theme-glass #ai-label {
     color: #a78bfa;
+    text-style: bold;
 }
 
 Screen.theme-glass #theme-label {
@@ -446,12 +508,13 @@ Screen.theme-glass #status-label {
 }
 
 Screen.theme-glass Header {
-    background: #0f0a2e;
+    background: #08041a;
     color: #a78bfa;
+    text-style: bold;
 }
 
 Screen.theme-glass Footer {
-    background: #1a1545;
+    background: #0c0824;
     color: #6366f1;
 }
 """

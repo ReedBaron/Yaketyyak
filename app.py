@@ -27,6 +27,7 @@ except ImportError:
     except Exception:
         SSL_CONTEXT = ssl._create_unverified_context()
 
+from rich.text import Text
 from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -44,14 +45,18 @@ from textual.widgets import (
 from textual.reactive import reactive
 from textual.message import Message
 
-from translator import translate, LANGUAGE_NAMES, AI_AVAILABLE, get_ai_status
+from translator import translate, validate_pro_key, activate_by_email, ProConnectionError, LANGUAGE_NAMES, AI_AVAILABLE, get_ai_status
 from knowledge_base import ensure_knowledge_base_exists
 from themes import (
     APP_CSS,
     load_theme_preference,
     save_theme_preference,
+    load_license_key,
+    save_license_key,
     THEME_NAMES,
 )
+
+APP_VERSION = "1.3.0"
 
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]|\x1b\].*?\x07|\x1b\[.*?[@-~]|\r")
 
@@ -117,6 +122,11 @@ automatically. No copy-paste needed!
   [dim]Ctrl+S[/]  Switch theme (Terminal / Glass)
   [dim]Ctrl+L[/]  Clear the translation panel
   [dim]Ctrl+Q[/]  Quit the app
+
+[bold]Pro Commands:[/]
+  Type [bold cyan]login your@email.com[/] to sign in with Pro
+  Type [bold cyan]account[/] to view your Pro subscription status
+  Get Pro: [bold cyan]https://yaketyyak.replit.app/#download[/]
 
 [bold]Tip:[/]
   All 25 starter commands are safe to run. They won't break
@@ -259,7 +269,7 @@ class YaketyYak(App):
 
     CSS = APP_CSS
 
-    TITLE = "Yakety Yak"
+    TITLE = f"Yakety Yak v{APP_VERSION}"
     SUB_TITLE = "Type commands in the shell \u2014 get plain-language explanations"
 
     BINDINGS = [
@@ -286,6 +296,8 @@ class YaketyYak(App):
         self._translation_id = 0
         self._shown_welcome = False
         self._app_theme = load_theme_preference()
+        self._license_key = load_license_key()
+        self._is_pro = False
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -369,6 +381,9 @@ class YaketyYak(App):
             ai_label.update("AI: ON")
         self._ai_status = ai_status
         self._ai_desc = ai_desc
+        if self._license_key:
+            self._validate_pro_key_on_startup()
+        self._show_shell_logo()
         self._show_welcome()
         self._show_git_placeholder()
 
@@ -377,61 +392,251 @@ class YaketyYak(App):
         screen.remove_class("theme-terminal", "theme-glass")
         screen.add_class(f"theme-{self._app_theme}")
 
+    def _validate_pro_key_on_startup(self) -> None:
+        try:
+            valid, data = validate_pro_key(self._license_key)
+            if valid and data.get("status") == "active":
+                self._is_pro = True
+                self.title = f"Yakety Yak v{APP_VERSION} [PRO]"
+                try:
+                    ai_label = self.query_one("#ai-label", Label)
+                    ai_label.update("AI: PRO")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    def _activate_pro(self, key: str) -> None:
+        trans = self.query_one("#translation-output", RichLog)
+        trans.write("")
+        trans.write("[bold]Activating license key...[/]")
+
+        try:
+            valid, data = validate_pro_key(key)
+        except ProConnectionError as e:
+            trans.write(f"[yellow]Could not reach the activation server.[/]")
+            trans.write(f"[dim]{e}[/]")
+            trans.write("[dim]Your key has been saved. It will be validated next time you're online.[/]")
+            save_license_key(key)
+            self._license_key = key
+            return
+        except Exception as e:
+            trans.write(f"[red]Activation error: {e}[/]")
+            return
+
+        if valid and data.get("status") == "active":
+            save_license_key(key)
+            self._license_key = key
+            self._is_pro = True
+            self.title = f"Yakety Yak v{APP_VERSION} [PRO]"
+            ai_label = self.query_one("#ai-label", Label)
+            ai_label.update("AI: PRO")
+            trans.write("")
+            trans.write("[bold green]License activated! Welcome to Yakety Yak Pro.[/]")
+            plan = data.get("plan", "pro")
+            usage = data.get("usage", {})
+            trans.write(f"  Plan: [bold]{plan}[/]")
+            trans.write(f"  Translations this month: {usage.get('translations_this_month', 0)} / {usage.get('limit', 500)}")
+            trans.write("")
+            trans.write("[dim]Cloud AI translations are now enabled.[/]")
+        else:
+            error = data.get("error", "Invalid or expired key")
+            trans.write(f"[red]Activation failed: {error}[/]")
+
+    def _login_pro(self, email: str) -> None:
+        trans = self.query_one("#translation-output", RichLog)
+        trans.write("")
+        trans.write(f"[bold]Signing in with {email}...[/]")
+
+        try:
+            key, data = activate_by_email(email)
+        except ProConnectionError as e:
+            trans.write(f"[yellow]Could not reach the activation server.[/]")
+            trans.write(f"[dim]{e}[/]")
+            return
+        except Exception as e:
+            trans.write(f"[red]Login error: {e}[/]")
+            return
+
+        if key:
+            save_license_key(key)
+            self._license_key = key
+            self._is_pro = True
+            self.title = f"Yakety Yak v{APP_VERSION} [PRO]"
+            ai_label = self.query_one("#ai-label", Label)
+            ai_label.update("AI: PRO")
+            trans.write("")
+            trans.write("[bold green]Welcome to Yakety Yak Pro![/]")
+            plan = data.get("plan", "pro")
+            usage = data.get("usage", {})
+            trans.write(f"  Plan: [bold]{plan}[/]")
+            trans.write(f"  Translations this month: {usage.get('translations_this_month', 0)} / {usage.get('limit', 500)}")
+            trans.write("")
+            trans.write("[dim]Cloud AI translations are now enabled.[/]")
+        else:
+            error = data.get("error", "No active Pro subscription found for this email")
+            trans.write(f"[red]{error}[/]")
+            trans.write("[dim]Make sure you're using the same email you used at checkout.[/]")
+            trans.write(f"[dim]Get Pro at https://yaketyyak.replit.app/#download[/]")
+
+    def _show_account(self) -> None:
+        trans = self.query_one("#translation-output", RichLog)
+        trans.write("")
+        if not self._license_key:
+            trans.write("[yellow]No Pro account found.[/]")
+            trans.write("[dim]Type 'login your@email.com' to sign in.[/]")
+            trans.write("[dim]Get Pro at https://yaketyyak.replit.app/#download[/]")
+            return
+
+        trans.write("[bold]Checking account status...[/]")
+        try:
+            valid, data = validate_pro_key(self._license_key)
+        except Exception:
+            trans.write(f"[yellow]Could not reach server. Your key: {self._license_key}[/]")
+            return
+
+        if valid:
+            plan = data.get("plan", "pro")
+            status = data.get("status", "unknown")
+            email = data.get("email", "")
+            usage = data.get("usage", {})
+            trans.write("")
+            trans.write("[bold green]Yakety Yak Pro Account[/]")
+            trans.write(f"  Email: [bold]{email}[/]")
+            trans.write(f"  Plan: [bold]{plan}[/]")
+            trans.write(f"  Status: [bold]{'[green]active[/green]' if status == 'active' else status}[/]")
+            trans.write(f"  Translations: {usage.get('translations_this_month', 0)} / {usage.get('limit', 500)} this month")
+            trans.write(f"  Key: [dim]{self._license_key}[/]")
+            trans.write("")
+            trans.write("[dim]Manage subscription: https://yaketyyak.replit.app/account[/]")
+        else:
+            error = data.get("error", "Invalid key")
+            trans.write(f"[red]{error}[/]")
+
+    def _show_shell_logo(self) -> None:
+        shell_out = self.query_one("#shell-output", ShellOutput)
+        is_glass = self._app_theme == "glass"
+        accent = "bright_magenta" if is_glass else "green"
+        dim_accent = "magenta" if is_glass else "dark_green"
+
+        logo_lines = [
+            "",
+            f"  ╔{'═' * 47}╗",
+            f"  ║                                               ║",
+            f"  ║   ██╗   ██╗ █████╗ ██╗  ██╗███████╗████████╗  ║",
+            f"  ║   ╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔════╝╚══██╔══╝  ║",
+            f"  ║    ╚████╔╝ ███████║█████╔╝ █████╗     ██║     ║",
+            f"  ║     ╚██╔╝  ██╔══██║██╔═██╗ ██╔══╝     ██║     ║",
+            f"  ║      ██║   ██║  ██║██║  ██╗███████╗   ██║     ║",
+            f"  ║      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝     ║",
+            f"  ║                                               ║",
+            f"  ║        ██╗   ██╗ █████╗ ██╗  ██╗              ║",
+            f"  ║        ╚██╗ ██╔╝██╔══██╗██║ ██╔╝              ║",
+            f"  ║         ╚████╔╝ ███████║█████╔╝               ║",
+            f"  ║          ╚██╔╝  ██╔══██║██╔═██╗               ║",
+            f"  ║           ██║   ██║  ██║██║  ██╗              ║",
+            f"  ║           ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝              ║",
+            f"  ║                                               ║",
+            f"  ╚{'═' * 47}╝",
+            "",
+        ]
+
+        for line in logo_lines:
+            t = Text(line)
+            t.stylize(accent)
+            shell_out.write(t)
+
+        tag = Text(f"  Terminal Translator v{APP_VERSION}")
+        tag.stylize(f"bold {accent}")
+        shell_out.write(tag)
+
+        sub = Text("  Type a command below — explanations appear on the right")
+        sub.stylize(f"{dim_accent}")
+        shell_out.write(sub)
+
+        sep = Text(f"  {'━' * 46}")
+        sep.stylize(f"{dim_accent}")
+        shell_out.write(sep)
+        shell_out.write(Text(""))
+
     def _show_welcome(self) -> None:
         trans = self.query_one("#translation-output", RichLog)
-        trans.write("[bold green]Welcome to Yakety Yak![/]")
         trans.write("")
-        trans.write("This tool explains everything that happens in your")
-        trans.write("terminal, in plain language. No experience needed!")
+        trans.write("[bold green]  ╔═══════════════════════════════════════════════╗[/]")
+        trans.write("[bold green]  ║                                               ║[/]")
+        trans.write("[bold green]  ║   ▄▄▄▄ ▄▄▄▄ ▄  ▄ ▄▄▄▄ ▄▄▄▄ ▄  ▄             ║[/]")
+        trans.write("[bold green]  ║   █  █ █  █ █ ▀▄▀ █▀▀  █▀▀  █  █             ║[/]")
+        trans.write("[bold green]  ║   █▄▄█ █▄▄█ █  █ █▄▄▄ █    █▄▄█             ║[/]")
+        trans.write("[bold green]  ║   ▀  ▀ ▀  ▀ ▀  ▀ ▀▀▀▀ ▀    ▀  ▀             ║[/]")
+        trans.write("[bold green]  ║                                               ║[/]")
+        trans.write(f"[bold green]  ║[/]   [bold green]Y A K E T Y   Y A K[/]  [dim]v{APP_VERSION}[/dim]          [bold green]║[/]")
+        trans.write("[bold green]  ║[/]   [dim italic]Terminal Translator — Understand Every Command[/] [bold green]║[/]")
+        trans.write("[bold green]  ║                                               ║[/]")
+        trans.write("[bold green]  ╚═══════════════════════════════════════════════╝[/]")
         trans.write("")
-        trans.write("[bold]Get started:[/]")
-        trans.write("  Type [bold cyan]try 1[/] to run your first command")
-        trans.write("  Type [bold cyan]/git owner/repo[/] to analyze a GitHub repo")
-        trans.write("  Press [bold cyan]Ctrl+G[/] to open the Git Translator view")
-        trans.write("  Type [bold cyan]help[/] for full instructions")
+        trans.write("  [bold]🎯 Quick Start[/]")
+        trans.write("  [bold green]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/]")
         trans.write("")
-        trans.write("[bold]Try these yourself:[/]")
-        trans.write(f"  [cyan]1.[/] [bold]{STARTER_COMMANDS[0][0]}[/] \u2014 {STARTER_COMMANDS[0][1]}")
-        trans.write(f"  [cyan]2.[/] [bold]{STARTER_COMMANDS[1][0]}[/] \u2014 {STARTER_COMMANDS[1][1]}")
-        trans.write(f"  [cyan]3.[/] [bold]{STARTER_COMMANDS[2][0]}[/] \u2014 {STARTER_COMMANDS[2][1]}")
-        trans.write(f"  [cyan]4.[/] [bold]{STARTER_COMMANDS[3][0]}[/] \u2014 {STARTER_COMMANDS[3][1]}")
-        trans.write(f"  [cyan]5.[/] [bold]{STARTER_COMMANDS[4][0]}[/] \u2014 {STARTER_COMMANDS[4][1]}")
+        trans.write("  This tool explains everything that happens in your")
+        trans.write("  terminal, in plain language. No experience needed!")
         trans.write("")
-        trans.write("[dim]Ctrl+B: Mode  |  Ctrl+G: Git View  |  Ctrl+T: AI  |  Ctrl+S: Theme  |  Ctrl+L: Clear  |  Ctrl+Q: Quit[/]")
+        trans.write("  [bold cyan]▸[/] Type [bold green]try 1[/] to run your first command")
+        trans.write("  [bold cyan]▸[/] Type [bold green]/git owner/repo[/] to analyze a GitHub repo")
+        trans.write("  [bold cyan]▸[/] Press [bold green]Ctrl+G[/] to open the Git Translator view")
+        trans.write("  [bold cyan]▸[/] Type [bold green]help[/] for full instructions")
+        trans.write("")
+        trans.write("  [bold]📋 Starter Commands[/]")
+        trans.write("  [bold green]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/]")
+        trans.write("")
+        trans.write(f"   [bold cyan]①[/]  [bold]{STARTER_COMMANDS[0][0]}[/]  [dim]—[/] {STARTER_COMMANDS[0][1]}")
+        trans.write(f"   [bold cyan]②[/]  [bold]{STARTER_COMMANDS[1][0]}[/]  [dim]—[/] {STARTER_COMMANDS[1][1]}")
+        trans.write(f"   [bold cyan]③[/]  [bold]{STARTER_COMMANDS[2][0]}[/]  [dim]—[/] {STARTER_COMMANDS[2][1]}")
+        trans.write(f"   [bold cyan]④[/]  [bold]{STARTER_COMMANDS[3][0]}[/]  [dim]—[/] {STARTER_COMMANDS[3][1]}")
+        trans.write(f"   [bold cyan]⑤[/]  [bold]{STARTER_COMMANDS[4][0]}[/]  [dim]—[/] {STARTER_COMMANDS[4][1]}")
+        trans.write("")
+        trans.write("  [bold]⌨  Keyboard Shortcuts[/]")
+        trans.write("  [bold green]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/]")
+        trans.write("")
+        trans.write("   [bold green]Ctrl+B[/] [dim]→[/] Cycle Mode    [bold green]Ctrl+G[/] [dim]→[/] Git View")
+        trans.write("   [bold green]Ctrl+T[/] [dim]→[/] AI Toggle     [bold green]Ctrl+L[/] [dim]→[/] Clear Panel")
+        trans.write("   [bold green]Ctrl+S[/] [dim]→[/] Switch Theme  [bold green]Ctrl+Q[/] [dim]→[/] Quit App")
+        trans.write("")
+        trans.write("  [bold green]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/]")
         if not AI_AVAILABLE:
             trans.write("")
-            trans.write("[yellow]AI is off \u2014 no AI backend detected.[/]")
-            trans.write("[dim]Install Ollama + qwen2.5-coder for free local AI,[/]")
-            trans.write("[dim]or set OPENAI_API_KEY for cloud AI.[/]")
-            trans.write("[dim]The built-in knowledge base (500+ commands) works without AI![/]")
+            trans.write("[bold yellow]  ⚠ AI is off — no AI backend detected.[/]")
+            trans.write("[dim]    Install Ollama + qwen2.5-coder for free local AI,[/]")
+            trans.write("[dim]    or set OPENAI_API_KEY for cloud AI.[/]")
+            trans.write("[dim]    The built-in knowledge base (500+ commands) works without AI![/]")
         elif hasattr(self, '_ai_status') and self._ai_status == "ollama_ready":
             trans.write("")
-            trans.write(f"[green]AI powered by Ollama (local, private, free)[/]")
+            trans.write("[bold green]  ✓ AI powered by Ollama (local, private, free)[/]")
         elif hasattr(self, '_ai_status') and self._ai_status == "ollama_no_model":
             trans.write("")
-            trans.write(f"[yellow]Ollama is running but model not installed.[/]")
-            trans.write(f"[dim]Run: ollama pull qwen2.5-coder:1.5b[/]")
-        trans.write("[dim]" + "\u2500" * 50 + "[/]")
+            trans.write("[bold yellow]  ⚠ Ollama is running but model not installed.[/]")
+            trans.write("[dim]    Run: ollama pull qwen2.5-coder:1.5b[/]")
+        trans.write("")
         self._shown_welcome = True
 
     def _show_git_placeholder(self) -> None:
         git_results = self.query_one("#git-results", RichLog)
         git_results.write("")
-        git_results.write("[bold]Git URL Translator[/]")
+        git_results.write("  [bold]Git URL Translator[/]")
+        git_results.write("  [bold green]\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501[/]")
         git_results.write("")
-        git_results.write("Paste a GitHub URL above and click ANALYZE to get a")
-        git_results.write("full breakdown of any repository including:")
+        git_results.write("  Paste a GitHub URL above and click ANALYZE to get a")
+        git_results.write("  full breakdown of any repository including:")
         git_results.write("")
-        git_results.write("  \u2605 Stars, forks, and watchers")
-        git_results.write("  \U0001f4bb Language and license info")
-        git_results.write("  \U0001f4ca Quality score with risk/reward analysis")
-        git_results.write("  \U0001f4c5 Activity and maintenance status")
-        git_results.write("  \U0001f3f7  Topics and metadata")
+        git_results.write("  [bold cyan]\u25b8[/] Stars, forks, and watchers")
+        git_results.write("  [bold cyan]\u25b8[/] Language and license info")
+        git_results.write("  [bold cyan]\u25b8[/] Quality score with risk/reward analysis")
+        git_results.write("  [bold cyan]\u25b8[/] Activity and maintenance status")
+        git_results.write("  [bold cyan]\u25b8[/] Topics and metadata")
         git_results.write("")
-        git_results.write("[dim]Examples:[/]")
-        git_results.write("  [cyan]https://github.com/torvalds/linux[/]")
-        git_results.write("  [cyan]https://github.com/textualize/textual[/]")
-        git_results.write("  [cyan]facebook/react[/]")
+        git_results.write("  [bold]Examples:[/]")
+        git_results.write("    [bold green]\u25b8[/] [cyan]https://github.com/torvalds/linux[/]")
+        git_results.write("    [bold green]\u25b8[/] [cyan]https://github.com/textualize/textual[/]")
+        git_results.write("    [bold green]\u25b8[/] [cyan]facebook/react[/]")
         git_results.write("")
         git_results.write("[dim]You can also type /git owner/repo in the terminal view.[/]")
 
@@ -482,6 +687,32 @@ class YaketyYak(App):
                 trans = self.query_one("#translation-output", RichLog)
                 trans.write(f"[yellow]No command #{num}. Type 'try' to see the list (1-{len(STARTER_COMMANDS)}).[/]")
                 return True
+
+        login_match = re.match(r"^login\s+(.+)$", cmd, re.IGNORECASE)
+        if login_match:
+            email = login_match.group(1).strip()
+            self._login_pro(email)
+            return True
+
+        if cmd == "login":
+            trans = self.query_one("#translation-output", RichLog)
+            trans.write("")
+            trans.write("[bold]Usage:[/] [cyan]login your@email.com[/]")
+            trans.write("[dim]Use the email you used when purchasing Pro.[/]")
+            return True
+
+        activate_match = re.match(r"^activate\s+(.+)$", cmd, re.IGNORECASE)
+        if activate_match:
+            key = activate_match.group(1).strip()
+            if "@" in key:
+                self._login_pro(key)
+            else:
+                self._activate_pro(key)
+            return True
+
+        if cmd == "account":
+            self._show_account()
+            return True
 
         translate_match = re.match(r"^(?:/translate|translate)\s+(.+)$", cmd, re.IGNORECASE)
         if translate_match:
@@ -1047,6 +1278,7 @@ class YaketyYak(App):
             mode=self.mode,
             language=self.language,
             use_ai=self.use_ai,
+            license_key=self._license_key if self._is_pro else "",
         )
 
         if tid != self._translation_id:
@@ -1059,6 +1291,8 @@ class YaketyYak(App):
 
         if source == "local_db":
             source_tag = "[green][Local KB][/green]"
+        elif source == "ai" and category == "cloud_ai_pro":
+            source_tag = "[bold #f0b429][PRO Cloud AI][/bold #f0b429]"
         elif source == "ai" and category == "ollama":
             source_tag = "[cyan][Ollama AI][/cyan]"
         elif source == "ai":
@@ -1080,12 +1314,13 @@ class YaketyYak(App):
 
     def _write_translation(self, trans_out, source_tag, category, preview, explanation):
         trans_out.write("")
-        trans_out.write(f"{source_tag} [dim]{category}[/dim]")
-        trans_out.write(f"[bold]> {preview}[/bold]")
+        trans_out.write(f"  {source_tag}  [dim italic]{category}[/dim]")
+        trans_out.write(f"  [bold cyan]\u25b8[/] [bold]{preview}[/bold]")
         trans_out.write("")
         for line in explanation.split("\n"):
-            trans_out.write(line)
-        trans_out.write("[dim]" + "\u2500" * 50 + "[/dim]")
+            trans_out.write(f"  {line}")
+        trans_out.write("")
+        trans_out.write("[dim green]  \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501[/dim]")
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id == "shell-input":
