@@ -1,11 +1,20 @@
 import os
 import urllib.request
 import json
+import ssl
 from knowledge_base import local_lookup, ensure_knowledge_base_exists
+
+try:
+    import certifi
+    _SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    _SSL_CTX = ssl.create_default_context()
 
 AI_INTEGRATIONS_OPENAI_API_KEY = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY")
 AI_INTEGRATIONS_OPENAI_BASE_URL = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+PRO_API_URL = os.environ.get("YAKETY_PRO_API_URL", "https://yaketyyak.replit.app")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5-coder:1.5b")
@@ -163,12 +172,86 @@ def translate_with_cloud(terminal_text, mode="beginner", language="en"):
     return response.choices[0].message.content or ""
 
 
-def translate(terminal_text, mode="beginner", language="en", use_ai=True):
+def translate_with_pro_proxy(terminal_text, license_key, mode="beginner", language="en"):
+    payload = json.dumps({
+        "license_key": license_key,
+        "text": terminal_text,
+        "mode": mode,
+        "language": language,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        f"{PRO_API_URL}/api/translate",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=30, context=_SSL_CTX) as resp:
+            data = json.loads(resp.read())
+        return {
+            "source": "ai",
+            "category": "cloud_ai_pro",
+            "explanation": data.get("explanation", ""),
+        }
+    except Exception as e:
+        return {
+            "source": "error",
+            "category": "error",
+            "explanation": f"Pro cloud translation failed: {e}",
+        }
+
+
+class ProConnectionError(Exception):
+    pass
+
+
+def activate_by_email(email):
+    payload = json.dumps({"email": email}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{PRO_API_URL}/api/activate-by-email",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as resp:
+            data = json.loads(resp.read())
+        return data.get("license_key", ""), data
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read()) if e.headers.get("content-type", "").startswith("application/json") else {}
+        return "", body
+    except (urllib.error.URLError, OSError, TimeoutError) as e:
+        raise ProConnectionError(f"Cannot reach activation server: {e}")
+
+
+def validate_pro_key(license_key):
+    payload = json.dumps({"license_key": license_key}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{PRO_API_URL}/api/validate-key",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as resp:
+            data = json.loads(resp.read())
+        return data.get("valid", False), data
+    except (urllib.error.URLError, OSError, TimeoutError) as e:
+        raise ProConnectionError(f"Cannot reach activation server: {e}")
+    except Exception:
+        return False, {}
+
+
+def translate(terminal_text, mode="beginner", language="en", use_ai=True, license_key=""):
     kb = ensure_knowledge_base_exists()
     local_result = local_lookup(terminal_text, kb, mode)
 
     if local_result:
         return local_result
+
+    if use_ai and license_key:
+        result = translate_with_pro_proxy(terminal_text, license_key, mode, language)
+        if result.get("source") != "error":
+            return result
 
     if use_ai:
         if OLLAMA_MODEL_READY and ollama_client:

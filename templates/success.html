@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Yakety Yak Pro!</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050810;
+            --surface: #0d1117;
+            --border: #1e2a3a;
+            --text: #e6edf3;
+            --text-dim: #8b949e;
+            --accent: #22d3a7;
+            --accent-glow: rgba(34, 211, 167, 0.15);
+            --pro-gold: #f0b429;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 560px;
+            width: 100%;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .pro-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--pro-gold), #e09400);
+            color: #000;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+        .step-num {
+            color: var(--accent);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .next-steps {
+            text-align: left;
+            margin: 2rem 0 1.5rem;
+        }
+        .next-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        .step-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .step-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .step-detail {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .download-buttons {
+            margin-top: 0.5rem;
+        }
+        .dl-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .dl-btn:hover { opacity: 0.85; }
+        .dl-other {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .dl-other-label {
+            color: var(--text-dim);
+            margin-right: 0.5rem;
+        }
+        .dl-link {
+            color: var(--accent);
+            text-decoration: none;
+            margin-right: 0.75rem;
+        }
+        .dl-link:hover { text-decoration: underline; }
+        .activate-cmd {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        .activate-cmd code {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            word-break: break-all;
+        }
+        .copy-cmd-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-dim);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .copy-cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        .link-btn:hover { border-color: var(--accent); }
+        .loading {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+        .error-msg {
+            color: #f85149;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div id="loading-state" class="loading">Setting up your account...</div>
+            <div id="success-state" style="display: none;">
+                <div class="pro-badge">PRO</div>
+                <h1>You're all set!</h1>
+                <p class="subtitle">Your Pro subscription is active for <strong id="user-email-display"></strong></p>
+
+                <div class="next-steps">
+                    <div class="next-title">Get started:</div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-num">1</span>
+                            <span class="step-label">Download Yakety Yak</span>
+                        </div>
+                        <div class="download-buttons" id="download-buttons">
+                            <a href="#" class="dl-btn" id="dl-auto">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span>Detecting platform...</span>
+                            </a>
+                            <div class="dl-other" id="dl-other">
+                                <span class="dl-other-label">Other platforms:</span>
+                                <a href="#" id="dl-mac" class="dl-link">macOS</a>
+                                <a href="#" id="dl-linux" class="dl-link">Linux</a>
+                                <a href="#" id="dl-win" class="dl-link">Windows</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-num">2</span>
+                            <span class="step-label">Sign in</span>
+                        </div>
+                        <p class="step-detail">Open Yakety Yak and type:</p>
+                        <div class="activate-cmd">
+                            <code>login <span id="user-email-cmd"></span></code>
+                            <button class="copy-cmd-btn" onclick="copyCmd()">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-num">3</span>
+                            <span class="step-label">Start translating</span>
+                        </div>
+                        <p class="step-detail">Cloud AI translations powered by GPT-5 are now available. Type any command and get instant explanations.</p>
+                    </div>
+                </div>
+
+                <div class="links">
+                    <a href="/account" class="link-btn" id="account-link">Manage Account</a>
+                    <a href="/" class="link-btn">Back to Home</a>
+                </div>
+            </div>
+            <div id="error-state" style="display: none;">
+                <h1>Something went wrong</h1>
+                <p class="error-msg" id="error-msg"></p>
+                <div class="links" style="margin-top: 1.5rem;">
+                    <a href="/" class="link-btn">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var REPO = 'myiephero/Yaketyyak';
+    var RELEASE_BASE = 'https://github.com/' + REPO + '/releases/latest/download/';
+    var RELEASES_PAGE = 'https://github.com/' + REPO + '/releases/latest';
+    var userEmail = '';
+
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var sessionId = params.get('session_id');
+
+        if (!sessionId) {
+            showError('No checkout session found. Please try again.');
+            return;
+        }
+
+        fetch('/api/checkout/success?session_id=' + encodeURIComponent(sessionId))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                userEmail = data.email || '';
+                document.getElementById('user-email-display').textContent = userEmail;
+                document.getElementById('user-email-cmd').textContent = userEmail;
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('success-state').style.display = 'block';
+
+                try { localStorage.setItem('yakety_pro_email', userEmail); } catch(e) {}
+
+                document.getElementById('account-link').href = '/account?email=' + encodeURIComponent(userEmail);
+
+                setupDownloads();
+            })
+            .catch(function(err) {
+                showError('Failed to retrieve your account. Please contact support.');
+            });
+
+        function showError(msg) {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('error-msg').textContent = msg;
+            document.getElementById('error-state').style.display = 'block';
+        }
+    })();
+
+    function setupDownloads() {
+        var ua = navigator.userAgent.toLowerCase();
+        var platform = 'unknown';
+        var dlName = '';
+        var label = '';
+
+        if (ua.indexOf('mac') !== -1) {
+            platform = 'mac';
+            dlName = 'yakety-yak-macos';
+            label = 'Download for macOS';
+        } else if (ua.indexOf('win') !== -1) {
+            platform = 'win';
+            dlName = 'yakety-yak-windows.exe';
+            label = 'Download for Windows';
+        } else if (ua.indexOf('linux') !== -1) {
+            platform = 'linux';
+            dlName = 'yakety-yak-linux';
+            label = 'Download for Linux';
+        }
+
+        var autoBtn = document.getElementById('dl-auto');
+        if (platform !== 'unknown') {
+            autoBtn.href = RELEASE_BASE + dlName;
+            autoBtn.querySelector('span').textContent = label;
+        } else {
+            autoBtn.href = RELEASES_PAGE;
+            autoBtn.querySelector('span').textContent = 'Download from GitHub';
+        }
+
+        document.getElementById('dl-mac').href = RELEASE_BASE + 'yakety-yak-macos';
+        document.getElementById('dl-linux').href = RELEASE_BASE + 'yakety-yak-linux';
+        document.getElementById('dl-win').href = RELEASE_BASE + 'yakety-yak-windows.exe';
+
+        var others = document.querySelectorAll('.dl-link');
+        for (var i = 0; i < others.length; i++) {
+            if ((platform === 'mac' && others[i].id === 'dl-mac') ||
+                (platform === 'linux' && others[i].id === 'dl-linux') ||
+                (platform === 'win' && others[i].id === 'dl-win')) {
+                others[i].style.display = 'none';
+            }
+        }
+    }
+
+    function clipCopy(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text);
+        }
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        return Promise.resolve();
+    }
+
+    function copyCmd() {
+        var cmd = 'login ' + userEmail;
+        clipCopy(cmd).then(function() {
+            var btn = document.querySelector('.copy-cmd-btn');
+            btn.textContent = 'Copied!';
+            btn.style.color = 'var(--accent)';
+            btn.style.borderColor = 'var(--accent)';
+            setTimeout(function() {
+                btn.textContent = 'Copy';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            }, 2000);
+        }).catch(function() {});
+    }
+    </script>
+</body>
+</html>
