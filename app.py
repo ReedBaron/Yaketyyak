@@ -56,7 +56,7 @@ from themes import (
     THEME_NAMES,
 )
 
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.2"
 
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]|\x1b\].*?\x07|\x1b\[.*?[@-~]|\r")
 
@@ -1220,22 +1220,32 @@ class YaketyYak(App):
         self.call_from_thread(status.update, "Ready")
 
     def _on_shell_output(self, text: str) -> None:
-        self.call_from_thread(self._handle_output, text)
+        try:
+            self.call_from_thread(self._handle_output, text)
+        except Exception:
+            pass
 
     def _handle_output(self, text: str) -> None:
-        shell_out = self.query_one("#shell-output", ShellOutput)
-        clean = strip_ansi(text)
-        for line in clean.split("\n"):
-            stripped = line.rstrip()
-            if stripped:
-                shell_out.write(stripped)
-                self._pending_lines.append(stripped)
+        try:
+            shell_out = self.query_one("#shell-output", ShellOutput)
+            clean = strip_ansi(text)
+            for line in clean.split("\n"):
+                stripped = line.rstrip()
+                if stripped:
+                    shell_out.write(stripped)
+                    self._pending_lines.append(stripped)
 
-        if self._debounce_task is not None:
-            self._debounce_task.cancel()
-        self._debounce_task = asyncio.get_event_loop().call_later(
-            0.8, self._trigger_translation
-        )
+            if self._debounce_task is not None:
+                self._debounce_task.cancel()
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = asyncio.get_event_loop()
+            self._debounce_task = loop.call_later(
+                0.8, self._trigger_translation
+            )
+        except Exception:
+            pass
 
     def _normalize_for_translation(self, lines):
         prompt_re = re.compile(r"^\$\s*")
@@ -1250,67 +1260,79 @@ class YaketyYak(App):
         return normalized
 
     def _trigger_translation(self) -> None:
-        if not self._pending_lines:
-            return
+        try:
+            if not self._pending_lines:
+                return
 
-        lines = list(self._pending_lines)
-        self._pending_lines.clear()
+            lines = list(self._pending_lines)
+            self._pending_lines.clear()
 
-        normalized = self._normalize_for_translation(lines)
-        if not normalized:
-            return
+            normalized = self._normalize_for_translation(lines)
+            if not normalized:
+                return
 
-        combined = "\n".join(normalized)
+            combined = "\n".join(normalized)
 
-        if combined == self._last_command:
-            return
+            if combined == self._last_command:
+                return
 
-        self._translation_id += 1
-        self._do_translate(combined, self._translation_id)
+            self._translation_id += 1
+            self._do_translate(combined, self._translation_id)
+        except Exception:
+            pass
 
     @work(thread=True, exclusive=True)
     def _do_translate(self, text: str, tid: int = 0) -> None:
-        status = self.query_one("#status-label", Label)
-        self.call_from_thread(status.update, "Translating...")
+        try:
+            status = self.query_one("#status-label", Label)
+            self.call_from_thread(status.update, "Translating...")
 
-        result = translate(
-            text,
-            mode=self.mode,
-            language=self.language,
-            use_ai=self.use_ai,
-            license_key=self._license_key if self._is_pro else "",
-        )
+            result = translate(
+                text,
+                mode=self.mode,
+                language=self.language,
+                use_ai=self.use_ai,
+                license_key=self._license_key if self._is_pro else "",
+            )
 
-        if tid != self._translation_id:
+            if tid != self._translation_id:
+                self.call_from_thread(status.update, "Ready")
+                return
+
+            explanation = result.get("explanation", "")
+            source = result.get("source", "")
+            category = result.get("category", "")
+
+            if source == "local_db":
+                source_tag = "[green][Local KB][/green]"
+            elif source == "ai" and category == "cloud_ai_pro":
+                source_tag = "[bold #f0b429][PRO Cloud AI][/bold #f0b429]"
+            elif source == "ai" and category == "ollama":
+                source_tag = "[cyan][Ollama AI][/cyan]"
+            elif source == "ai":
+                source_tag = "[blue][Cloud AI][/blue]"
+            elif source == "error":
+                source_tag = "[red][Error][/red]"
+            else:
+                source_tag = "[dim][No match][/dim]"
+
+            preview = text[:80].replace("\n", " ")
+            if len(text) > 80:
+                preview += "..."
+
+            trans_out = self.query_one("#translation-output", RichLog)
+            self.call_from_thread(
+                self._write_translation, trans_out, source_tag, category, preview, explanation
+            )
             self.call_from_thread(status.update, "Ready")
-            return
-
-        explanation = result.get("explanation", "")
-        source = result.get("source", "")
-        category = result.get("category", "")
-
-        if source == "local_db":
-            source_tag = "[green][Local KB][/green]"
-        elif source == "ai" and category == "cloud_ai_pro":
-            source_tag = "[bold #f0b429][PRO Cloud AI][/bold #f0b429]"
-        elif source == "ai" and category == "ollama":
-            source_tag = "[cyan][Ollama AI][/cyan]"
-        elif source == "ai":
-            source_tag = "[blue][Cloud AI][/blue]"
-        elif source == "error":
-            source_tag = "[red][Error][/red]"
-        else:
-            source_tag = "[dim][No match][/dim]"
-
-        preview = text[:80].replace("\n", " ")
-        if len(text) > 80:
-            preview += "..."
-
-        trans_out = self.query_one("#translation-output", RichLog)
-        self.call_from_thread(
-            self._write_translation, trans_out, source_tag, category, preview, explanation
-        )
-        self.call_from_thread(status.update, "Ready")
+        except Exception as e:
+            try:
+                status = self.query_one("#status-label", Label)
+                self.call_from_thread(status.update, "Ready")
+                trans_out = self.query_one("#translation-output", RichLog)
+                self.call_from_thread(trans_out.write, f"[red]Translation error: {e}[/red]")
+            except Exception:
+                pass
 
     def _write_translation(self, trans_out, source_tag, category, preview, explanation):
         trans_out.write("")
@@ -1485,5 +1507,16 @@ class YaketyYak(App):
 
 
 if __name__ == "__main__":
-    app = YaketyYak()
-    app.run()
+    import traceback as _tb
+    _crash_log = os.path.join(os.path.expanduser("~"), ".yakety-yak", "crash.log")
+    os.makedirs(os.path.dirname(_crash_log), exist_ok=True)
+    try:
+        app = YaketyYak()
+        app.run()
+    except Exception as _exc:
+        with open(_crash_log, "a") as _f:
+            _f.write(f"\n--- Crash at {datetime.now().isoformat()} ---\n")
+            _tb.print_exc(file=_f)
+        print(f"\nYakety Yak crashed. Details saved to: {_crash_log}")
+        print(f"Error: {_exc}")
+        _tb.print_exc()
